@@ -56,7 +56,7 @@ The printed parts are dimensioned around two ROBOTIS components:
 | Part | Role |
 |---|---|
 | **XC430-T240BB-T** | the servo, three per leg |
-| **FR12-H101** | the horn bracket the next link bolts to |
+| **HN11-I101** | the idler bearing set for DYNAMIXEL XL 430 series |
 
 Their drawings and STEP models are not reproduced here - they are ROBOTIS's documents, and
 the current versions are on the
