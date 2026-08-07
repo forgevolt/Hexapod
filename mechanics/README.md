@@ -60,5 +60,5 @@ The printed parts are dimensioned around two ROBOTIS components:
 
 Their drawings and STEP models are not reproduced here - they are ROBOTIS's documents, and
 the current versions are on the
-[ROBOTIS e-Manual](https://emanual.robotis.com/docs/en/dxl/x/xc430-t240/). Download them
+[ROBOTIS e-Manual](https://docs.robotis.com/docs/dxl/model_reference/x_series/xc_series/xc430-t240bb). Download them
 from there if you need to check a fit or modify a bracket.
