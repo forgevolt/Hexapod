@@ -2,7 +2,7 @@
 
 The custom ESP32-S3 controller board: everything needed to have it made, and to change it.
 
-![The hexapod](docs/hexapod.jpg)
+![The hexapod](/docs/hexapod.jpg)
 
 | Path | Contents |
 |---|---|
