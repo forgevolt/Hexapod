@@ -378,8 +378,8 @@ void Hexapod::step(float dt_ms)
     if (changed == true)
     {
       myReceiver.setMessage(0, "Clearance",   myStrGroundClearance);
-      myReceiver.setMessage(1, "Step Height", myStrStepHeight);
-      myReceiver.setMessage(2, "Step Length", myStrStepLength);
+      myReceiver.setMessage(1, "Step Length", myStrStepLength);
+      myReceiver.setMessage(2, "Step Height", myStrStepHeight);
       myReceiver.setMessage(3, "Gait Type",   myLastGait == nullptr ? "" : myLastGait->name().c_str());
     }
   }
