@@ -46,6 +46,7 @@ class Hexapod
 
     Leg& leg(std::size_t index);
     ServoBus& servoBus() { return myServoBus; }
+    Receiver& receiver() { return myReceiver; }
 
     // Gait parameters, for gaits to read and for the telemetry report.
     const GaitEngine::GaitParams& gaitParams() const { return myGaitEngine.params(); }

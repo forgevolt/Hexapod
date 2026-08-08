@@ -225,8 +225,16 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
     Vector2 direction = circularNormalization(-myLinearX / cJoystickMax, myLinearY / cJoystickMax);
     float magDirection = direction.length();
 
-    // When SWITCH 2 is false: RX -> rotate hexapod around its vertical axis (yaw)
-    myAngularZ = (input.switch2 == false) ? lowPassFilter(myAngularZ, input.RX, 25.0f, dt_ms) : 0.0f;
+    // When SWITCH 2 is false: RX (-> 2-joy transmitter) or LZ (1-joy transmitter) rotate hexapod 
+    // around its vertical axis (yaw)
+    static ESPNowConnection::PeerInfo peerInfo;
+    float inputRotation = 0.0f;
+    if (myHexapod.receiver().getPeerInfo(peerInfo) == true && peerInfo.device == eTransmitter1Joy)
+      inputRotation = input.LZ;
+    else
+      inputRotation = input.RX;
+
+    myAngularZ = (input.switch2 == false) ? lowPassFilter(myAngularZ, inputRotation, 25.0f, dt_ms) : 0.0f;
     float magRotation = fabs(myAngularZ) / cJoystickMax;
     
     // Compute magnitude with magDirection as the 'Master'
