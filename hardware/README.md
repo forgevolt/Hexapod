@@ -2,6 +2,8 @@
 
 The custom ESP32-S3 controller board: everything needed to have it made, and to change it.
 
+![The hexapod](docs/hexapod.jpg)
+
 | Path | Contents |
 |---|---|
 | `easyeda/ProPrj_Hexapod_2026-08-06.epro2` | The editable EasyEDA Pro project - schematic and layout |
