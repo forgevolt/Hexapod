@@ -597,6 +597,8 @@ void Hexapod::stepPosing()
 // ----------------------------------------------------------------------------------------
 void Hexapod::stepWalking()
 {
+  // ----- LED effects
+
   // Walking forward?
   if (myControlData.LY > 0)
   {
@@ -620,6 +622,8 @@ void Hexapod::stepWalking()
     myLeds.setEffect(IndicatorLeds::Effect::eNone);
   }
 
+  // ----- Eye effects
+
   // Map joystick input to eye position
   // Note: if switch2 == true then "adjust gait" is active
   if (abs(myControlData.LX) >= abs(myControlData.RX) || myControlData.switch2 == true)
@@ -629,6 +633,7 @@ void Hexapod::stepWalking()
     myStatusDisplay.setLookDirection(mapf(myControlData.RX * -1, cJoystickMin, cJoystickMax, -1.0f, 1.0f),
                                 mapf(myControlData.LY,      cJoystickMin, cJoystickMax, -1.0f, 1.0f));
 
+  // ----- Process inputs
 
   setButtonLabels("Park", "Change Gait");
 
@@ -674,22 +679,22 @@ void Hexapod::stepWalking()
     myGaitEngine.requestGait(&myWalkingGaits[myCurrentWalkingGait % cNumWalkingGaits]); 
   }
 
-  // Start posing?
-  else if (myControlData.switch3 == true)
+  // Start posing? (adjust gait switch S2 must not be active)
+  else if (myControlData.switch3 == true && myControlData.switch2 == false)
   {
     myGaitEngine.requestGait(&myPosingGait);
     changeState(HexapodState::ePosing);
   }
 
-  // Start posing?
-  else if (myControlData.switch4 == true)
+  // Start posing? (adjust gait switch S2 must not be active)
+  else if (myControlData.switch4 == true && myControlData.switch2 == false)
   {
     myGaitEngine.requestGait(&myLevelGait);
     changeState(HexapodState::eStandingLeveled);
   }
 
-  // No user input?
-  else if (myTimePassedMS > cIdleTimeout)
+  // No user input? (adjust gait switch S2 must not be active)
+  else if (myTimePassedMS > cIdleTimeout && myControlData.switch2 == false)
   {
     myGaitEngine.requestGait(&myStandUpGait, cStandUpDeployedMs);
     changeState(HexapodState::eStanding);
