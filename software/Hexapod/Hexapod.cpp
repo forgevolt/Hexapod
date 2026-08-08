@@ -419,7 +419,7 @@ void Hexapod::stepInitializing()
   }
 
   // Wait until a connection to the transmitter is established
-  else if (myReceiver.isPaired() == true)
+  else if (isLinkHealthy() == true)
   {
     // First, return to parking position if torque isn't (fully) on. 
     // If even one servo silently failed to torque on, we want to re-park rather than 
