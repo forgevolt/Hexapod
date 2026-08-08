@@ -511,7 +511,7 @@ void Hexapod::stepStanding()
   // Start walking?
   else if (myControlData.LX != 0 || myControlData.LY != 0 || myControlData.LZ != 0 ||
            myControlData.RX != 0 || myControlData.RY != 0 || myControlData.RZ != 0 ||
-           myControlData.joyR == true)
+           myControlData.joyR == true || myControlData.switch2 == true)
   {
     myGaitEngine.requestGait(&myWalkingGaits[myCurrentWalkingGait % cNumWalkingGaits]);
     changeState(HexapodState::eWalking);
