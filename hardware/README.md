@@ -2,7 +2,11 @@
 
 The custom ESP32-S3 controller board: everything needed to have it made, and to change it.
 
-![The hexapod](/docs/hexapod.jpg)
+![PCB](/docs/PCB.jpg)
+
+| Test harness 1 | Test harness 2 |
+|---|---|
+| ![Test 1](/docs/test-harness1.jpg) | ![Test 2](/docs/test-harness2.jpg) |
 
 | Path | Contents |
 |---|---|
