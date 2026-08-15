@@ -4,7 +4,10 @@ A six-legged walking robot built on an ESP32-S3, driving 18 Dynamixel servos wit
 kinematics at 200 Hz. It walks in three gaits, levels its chassis against uneven ground using
 an onboard IMU, and is driven from a separate handheld transmitter over ESP-NOW.
 
-![The hexapod](docs/hexapod.jpg)
+[![The hexapod](docs/hexapod.jpg)](https://youtu.be/4UdU5Dw7Or8)
+
+▶ **[Watch it walk](https://youtu.be/4UdU5Dw7Or8)** - 14 seconds: leveling on planted feet,
+then walking toward the camera.
 
 ## What it does
 
