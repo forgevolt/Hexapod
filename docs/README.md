@@ -3,6 +3,8 @@
 | Path | Contents |
 |---|---|
 | `hexapod.jpg` | The photograph the top-level README shows |
+| `PCB.jpg` | The assembled controller board, shown in `hardware/README.md` |
+| `test-harness1.jpg`, `test-harness2.jpg` | The bring-up harness, shown in `hardware/README.md` |
 | `Hexapod-IKMath.pdf` | The inverse-kinematics derivation for this geometry |
 
 ## `Hexapod-IKMath.pdf`
