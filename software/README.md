@@ -25,6 +25,9 @@ because an 18-servo machine is painful to debug all at once.
 | `build_opt.h` | re-enables `-Wsign-compare`, which the core suppresses |
 | `partitions.csv` | 6 MB app + 9.8 MB LittleFS; overrides the Tools menu |
 
+The state machine in `Hexapod.cpp` - every state, guard, gait and timeout - is drawn in
+[`docs/state-machine-detail.md`](../docs/state-machine-detail.md).
+
 Audio and radio transport are not here - they are the `SoundEngine` and `ESPNowUtilities`
 libraries, installed through the Library Manager. `RCProtocol.h` is a copy of the
 transmitter's master; see the note in the top-level README.

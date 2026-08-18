@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Hexapod state machine, generated from Hexapod.cpp with graphviz -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="862pt" height="875pt" viewBox="0 0 862.00 875.00">
+<rect width="100%" height="100%" fill="white"/>
+<svg x="0" y="0" width="862.00" height="680.00" viewBox="0.00 0.00 861.90 680.40" overflow="visible">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(25.2 655.2)">
+<title>hexapod</title>
+<polygon fill="white" stroke="transparent" points="-25.2,25.2 -25.2,-655.2 836.7,-655.2 836.7,25.2 -25.2,25.2"/>
+
+<g id="node1" class="node">
+<title>Off</title>
+<path fill="#e7e9ec" stroke="#3a4048" stroke-width="2" d="M436,-630C436,-630 391,-630 391,-630 385,-630 379,-624 379,-618 379,-618 379,-601 379,-601 379,-595 385,-589 391,-589 391,-589 436,-589 436,-589 442,-589 448,-595 448,-601 448,-601 448,-618 448,-618 448,-624 442,-630 436,-630"/>
+<text text-anchor="middle" x="413.5" y="-606" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="15.00">Off</text>
+</g>
+
+<g id="node2" class="node">
+<title>Initializing</title>
+<path fill="#fde7d6" stroke="#e8590c" stroke-width="2" d="M468.5,-486C468.5,-486 358.5,-486 358.5,-486 352.5,-486 346.5,-480 346.5,-474 346.5,-474 346.5,-457 346.5,-457 346.5,-451 352.5,-445 358.5,-445 358.5,-445 468.5,-445 468.5,-445 474.5,-445 480.5,-451 480.5,-457 480.5,-457 480.5,-474 480.5,-474 480.5,-480 474.5,-486 468.5,-486"/>
+<text text-anchor="middle" x="413.5" y="-462" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="15.00">Initializing</text>
+</g>
+
+<g id="edge1" class="edge">
+<title>Off&#45;&gt;Initializing</title>
+<path fill="none" stroke="#606874" stroke-width="1.6" d="M378.89,-599.31C341.56,-587.49 289.81,-564.42 308.5,-531 318.28,-513.51 334.96,-500.19 352.18,-490.32"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.6" points="354.05,-492.69 360.1,-486.03 351.21,-487.46 354.05,-492.69"/>
+<text text-anchor="middle" x="357.5" y="-534.4" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b">power switch on</text>
+</g>
+
+<g id="edge2" class="edge">
+<title>Initializing&#45;&gt;Off</title>
+<path fill="none" stroke="#606874" stroke-width="1.6" d="M417.34,-486.21C419.94,-501.85 422.72,-524.29 421.5,-544 420.76,-555.91 419.27,-568.98 417.77,-580.23"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.6" points="414.81,-579.97 416.58,-588.8 420.7,-580.79 414.81,-579.97"/>
+<text text-anchor="middle" x="472" y="-534.4" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b">power switch off</text>
+</g>
+
+<g id="node3" class="node">
+<title>Ready</title>
+<path fill="#fde7d6" stroke="#e8590c" stroke-width="2" d="M449.5,-342C449.5,-342 377.5,-342 377.5,-342 371.5,-342 365.5,-336 365.5,-330 365.5,-330 365.5,-313 365.5,-313 365.5,-307 371.5,-301 377.5,-301 377.5,-301 449.5,-301 449.5,-301 455.5,-301 461.5,-307 461.5,-313 461.5,-313 461.5,-330 461.5,-330 461.5,-336 455.5,-342 449.5,-342"/>
+<text text-anchor="middle" x="413.5" y="-318" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="15.00">Ready</text>
+</g>
+
+<g id="edge3" class="edge">
+<title>Initializing&#45;&gt;Ready</title>
+<path fill="none" stroke="#606874" stroke-width="1.6" d="M413.5,-444.76C413.5,-420.38 413.5,-378.75 413.5,-350.94"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.6" points="416.48,-350.58 413.5,-342.08 410.53,-350.58 416.48,-350.58"/>
+<text text-anchor="middle" x="468" y="-390.4" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b">transmitter paired</text>
+</g>
+
+<g id="node4" class="node">
+<title>Standing</title>
+<path fill="#fff3bf" stroke="#b58b00" stroke-width="2" d="M461.5,-185C461.5,-185 365.5,-185 365.5,-185 359.5,-185 353.5,-179 353.5,-173 353.5,-173 353.5,-156 353.5,-156 353.5,-150 359.5,-144 365.5,-144 365.5,-144 461.5,-144 461.5,-144 467.5,-144 473.5,-150 473.5,-156 473.5,-156 473.5,-173 473.5,-173 473.5,-179 467.5,-185 461.5,-185"/>
+<text text-anchor="middle" x="413.5" y="-161" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="15.00">Standing</text>
+</g>
+
+<g id="edge4" class="edge">
+<title>Ready&#45;&gt;Standing</title>
+<path fill="none" stroke="#606874" stroke-width="1.6" d="M372.07,-300.98C343.13,-284.38 312.04,-258.71 326.5,-230 334.86,-213.4 349.73,-200.01 364.84,-189.82"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.6" points="366.69,-192.16 372.25,-185.07 363.48,-187.15 366.69,-192.16"/>
+<text text-anchor="middle" x="357.5" y="-239.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b">left button</text>
+</g>
+
+<g id="edge5" class="edge">
+<title>Standing&#45;&gt;Ready</title>
+<path fill="none" stroke="#606874" stroke-width="1.6" d="M413.5,-185.46C413.5,-212.63 413.5,-261.38 413.5,-292.28"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.6" points="410.53,-292.37 413.5,-300.87 416.48,-292.37 410.53,-292.37"/>
+<text text-anchor="start" x="413.5" y="-246.4" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b">left button</text>
+<text text-anchor="start" x="413.5" y="-233.4" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b">30 s idle</text>
+</g>
+
+<g id="node5" class="node">
+<title>Walking</title>
+<path fill="#d9f2e0" stroke="#2b8a3e" stroke-width="2" d="M99,-41C99,-41 12,-41 12,-41 6,-41 0,-35 0,-29 0,-29 0,-12 0,-12 0,-6 6,0 12,0 12,0 99,0 99,0 105,0 111,-6 111,-12 111,-12 111,-29 111,-29 111,-35 105,-41 99,-41"/>
+<text text-anchor="middle" x="55.5" y="-17" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="15.00">Walking</text>
+</g>
+
+<g id="edge6" class="edge">
+<title>Standing&#45;&gt;Walking</title>
+<path fill="none" stroke="#606874" stroke-width="1.6" d="M353.2,-162.5C255.5,-159.46 69.38,-147.3 28.5,-99 16.37,-84.66 23.89,-64.55 34.04,-48.4"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.6" points="36.54,-50.01 38.82,-41.29 31.61,-46.68 36.54,-50.01"/>
+<text text-anchor="middle" x="66.5" y="-89.4" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b">move a stick</text>
+</g>
+
+<g id="node6" class="node">
+<title>Posing</title>
+<path fill="#e3e9fb" stroke="#3a56a8" stroke-width="2" d="M515.5,-41C515.5,-41 437.5,-41 437.5,-41 431.5,-41 425.5,-35 425.5,-29 425.5,-29 425.5,-12 425.5,-12 425.5,-6 431.5,0 437.5,0 437.5,0 515.5,0 515.5,0 521.5,0 527.5,-6 527.5,-12 527.5,-12 527.5,-29 527.5,-29 527.5,-35 521.5,-41 515.5,-41"/>
+<text text-anchor="middle" x="476.5" y="-17" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="15.00">Posing</text>
+</g>
+
+<g id="edge9" class="edge">
+<title>Standing&#45;&gt;Posing</title>
+<path fill="none" stroke="#606874" stroke-width="1.6" d="M361.95,-143.87C333.53,-129.9 306.87,-109.5 322.5,-86 343.45,-54.52 383.03,-38.37 416.82,-30.11"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.6" points="417.65,-32.97 425.27,-28.17 416.32,-27.17 417.65,-32.97"/>
+<text text-anchor="middle" x="357.5" y="-89.4" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b">Switch 3 on</text>
+</g>
+
+<g id="node7" class="node">
+<title>Balancing</title>
+<path fill="#e3e9fb" stroke="#3a56a8" stroke-width="2" d="M799.5,-41C799.5,-41 697.5,-41 697.5,-41 691.5,-41 685.5,-35 685.5,-29 685.5,-29 685.5,-12 685.5,-12 685.5,-6 691.5,0 697.5,0 697.5,0 799.5,0 799.5,0 805.5,0 811.5,-6 811.5,-12 811.5,-12 811.5,-29 811.5,-29 811.5,-35 805.5,-41 799.5,-41"/>
+<text text-anchor="middle" x="748.5" y="-17" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="15.00">Balancing</text>
+</g>
+
+<g id="edge11" class="edge">
+<title>Standing&#45;&gt;Balancing</title>
+<path fill="none" stroke="#606874" stroke-width="1.6" d="M459.73,-143.9C521.09,-117.89 629.26,-72.04 694.37,-44.45"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.6" points="695.81,-47.06 702.48,-41.01 693.49,-41.59 695.81,-47.06"/>
+<text text-anchor="middle" x="626.5" y="-89.4" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b">Switch 4 on</text>
+</g>
+
+<g id="edge7" class="edge">
+<title>Walking&#45;&gt;Standing</title>
+<path fill="none" stroke="#606874" stroke-width="1.6" d="M104.11,-41C143.33,-56.72 199.94,-79.35 249.5,-99 284.62,-112.92 324.01,-128.42 355.38,-140.73"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.6" points="354.59,-143.62 363.59,-143.95 356.77,-138.08 354.59,-143.62"/>
+<text text-anchor="middle" x="274.5" y="-89.4" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b">15 s idle</text>
+</g>
+
+<g id="edge8" class="edge">
+<title>Walking&#45;&gt;Walking</title>
+<path fill="none" stroke="#606874" stroke-width="1.6" d="M111.11,-32.58C150.69,-36.44 190,-32.42 190,-20.5 190,-9.47 156.31,-5.2 119.91,-7.69"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.6" points="119.34,-4.75 111.11,-8.42 119.83,-10.68 119.34,-4.75"/>
+<text text-anchor="middle" x="259.5" y="-17.4" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b"> &#160;right button: next gait</text>
+</g>
+
+
+<g id="edge10" class="edge">
+<title>Posing&#45;&gt;Standing</title>
+<path fill="none" stroke="#606874" stroke-width="1.6" d="M467.81,-41.08C456.9,-65.69 438.09,-108.08 425.72,-135.96"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.6" points="422.99,-134.78 422.26,-143.76 428.43,-137.19 422.99,-134.78"/>
+<text text-anchor="middle" x="482.5" y="-89.4" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b">Switch 3 off</text>
+</g>
+
+
+<g id="edge12" class="edge">
+<title>Balancing&#45;&gt;Standing</title>
+<path fill="none" stroke="#606874" stroke-width="1.6" d="M736.42,-41.12C724.42,-58.93 704.4,-84.55 680.5,-99 619.56,-135.85 538.86,-151.65 482.19,-158.43"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.6" points="481.77,-155.48 473.66,-159.4 482.44,-161.39 481.77,-155.48"/>
+<text text-anchor="middle" x="731.5" y="-89.4" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00" fill="#2e343b">Switch 4 off</text>
+</g>
+</g>
+</svg>
+<svg x="8.00" y="706.00" width="381.00" height="169.00" viewBox="1.44 1.44 379.08 167.08" overflow="visible">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(5.76 162.76)">
+<title>note</title>
+<polygon fill="white" stroke="transparent" points="-4.32,4.32 -4.32,-161.32 373.32,-161.32 373.32,4.32 -4.32,4.32"/>
+
+<g id="node1" class="node">
+<title>note</title>
+<polygon fill="#fffdf3" stroke="#b58b00" stroke-width="1.4" points="363,-157 0,-157 0,0 369,0 369,-151 363,-157"/>
+<polyline fill="none" stroke="#b58b00" stroke-width="1.4" points="363,-157 363,-151 "/>
+<polyline fill="none" stroke="#b58b00" stroke-width="1.4" points="369,-151 363,-151 "/>
+<text text-anchor="start" x="25.5" y="-128.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-weight="bold" font-size="12.50">From Standing, Walking, Posing or Balancing</text>
+<text text-anchor="start" x="25.5" y="-107.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.50">the </text>
+<text text-anchor="start" x="50.5" y="-107.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-weight="bold" font-size="12.50">left button</text>
+<text text-anchor="start" x="126.5" y="-107.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.50"> parks the robot → Ready</text>
+<text text-anchor="start" x="25.5" y="-86.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.50">a </text>
+<text text-anchor="start" x="37.5" y="-86.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-weight="bold" font-size="12.50">lost link</text>
+<text text-anchor="start" x="95.5" y="-86.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.50"> or the </text>
+<text text-anchor="start" x="141.5" y="-86.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-weight="bold" font-size="12.50">power switch off</text>
+<text text-anchor="start" x="258.5" y="-86.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.50"> → Initializing</text>
+<text text-anchor="start" x="25.5" y="-64.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.50"> </text>
+<text text-anchor="start" x="25.5" y="-44.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.50">Switch 3 and Switch 4 also work </text>
+<text text-anchor="start" x="234.5" y="-44.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-weight="bold" font-size="12.50">while walking</text>
+<text text-anchor="start" x="331.5" y="-44.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.50">,</text>
+<text text-anchor="start" x="25.5" y="-22.5" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.50">and Switch 3 works while balancing.</text>
+</g>
+</g>
+</svg>
+</svg>

@@ -129,6 +129,38 @@ the robot boots, pairing completes as soon as the robot is up.
 
 Internally these are states, and they explain why a control sometimes does nothing.
 
+```mermaid
+flowchart TD
+    Off["Off"] -->|"power switch on"| Init["Initializing"]
+    Init -->|"power switch off"| Off
+    Init -->|"transmitter paired"| Ready["Ready"]
+    Ready -->|"left button"| Standing["Standing"]
+    Standing -->|"left button<br>30 s idle"| Ready
+    Standing -->|"move a stick"| Walking["Walking"]
+    Walking -->|"15 s idle"| Standing
+    Walking -->|"right button:<br>next gait"| Walking
+    Standing -->|"Switch 3 on"| Posing["Posing"]
+    Posing -->|"Switch 3 off"| Standing
+    Standing -->|"Switch 4 on"| Balancing["Balancing"]
+    Balancing -->|"Switch 4 off"| Standing
+
+    N["<b>From Standing, Walking, Posing or Balancing</b><br>the <b>left button</b> parks the robot → Ready<br>a <b>lost link</b> or the <b>power switch off</b> → Initializing<br>&nbsp;<br>Switch 3 and Switch 4 also work <b>while walking</b>,<br>and Switch 3 works while balancing."]
+    Off ~~~ N
+
+    classDef s_off  fill:#E7E9EC,stroke:#3A4048,stroke-width:2px,color:#1A1E24
+    classDef s_init fill:#FDE7D6,stroke:#E8590C,stroke-width:2px,color:#1A1E24
+    classDef s_stnd fill:#FFF3BF,stroke:#B58B00,stroke-width:2px,color:#1A1E24
+    classDef s_walk fill:#D9F2E0,stroke:#2B8A3E,stroke-width:2px,color:#1A1E24
+    classDef s_mode fill:#E3E9FB,stroke:#3A56A8,stroke-width:2px,color:#1A1E24
+    classDef s_note fill:#FFFDF3,stroke:#B58B00,stroke-width:1.5px,color:#1A1E24
+    class Off s_off
+    class Init,Ready s_init
+    class Standing s_stnd
+    class Walking s_walk
+    class Posing,Balancing s_mode
+    class N s_note
+```
+
 | State | How you get there | What it is |
 |---|---|---|
 | **Off** | on/off switch off | Torque released, display blank |
@@ -141,6 +173,9 @@ Internally these are states, and they explain why a control sometimes does nothi
 
 Walking, posing and balancing all return to Standing when you release what put you there.
 The left button parks from any of them.
+
+The same machine with the guards, gaits and constants from `Hexapod.cpp` is in
+[`state-machine-detail.md`](state-machine-detail.md).
 
 **Transitions cannot be interrupted, and presses during one are dropped rather than queued.**
 A park takes 3 s; acting on a button pressed three seconds ago is not what you would expect,

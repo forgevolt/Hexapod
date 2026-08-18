@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Hexapod state machine, generated from Hexapod.cpp with graphviz -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2026pt" height="1173pt" viewBox="0 0 2026.00 1173.00">
+<rect width="100%" height="100%" fill="white"/>
+<svg x="0" y="0" width="2026.00" height="700.00" viewBox="0.00 0.00 2026.20 700.03" overflow="visible">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(25.2 674.83)">
+<title>hexapod_detail</title>
+<polygon fill="white" stroke="transparent" points="-25.2,25.2 -25.2,-674.83 2001,-674.83 2001,25.2 -25.2,25.2"/>
+
+<g id="node1" class="node">
+<title>eOff</title>
+<path fill="#e7e9ec" stroke="#3a4048" stroke-width="2" d="M62,-286.63C62,-286.63 12,-286.63 12,-286.63 6,-286.63 0,-280.63 0,-274.63 0,-274.63 0,-259.63 0,-259.63 0,-253.63 6,-247.63 12,-247.63 12,-247.63 62,-247.63 62,-247.63 68,-247.63 74,-253.63 74,-259.63 74,-259.63 74,-274.63 74,-274.63 74,-280.63 68,-286.63 62,-286.63"/>
+<text text-anchor="middle" x="37" y="-263.43" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.00">eOff</text>
+</g>
+
+<g id="node2" class="node">
+<title>eInitializing</title>
+<path fill="#fde7d6" stroke="#e8590c" stroke-width="2" d="M519,-286.63C519,-286.63 395,-286.63 395,-286.63 389,-286.63 383,-280.63 383,-274.63 383,-274.63 383,-259.63 383,-259.63 383,-253.63 389,-247.63 395,-247.63 395,-247.63 519,-247.63 519,-247.63 525,-247.63 531,-253.63 531,-259.63 531,-259.63 531,-274.63 531,-274.63 531,-280.63 525,-286.63 519,-286.63"/>
+<text text-anchor="middle" x="457" y="-263.43" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.00">eInitializing</text>
+</g>
+
+<g id="edge1" class="edge">
+<title>eOff&#45;&gt;eInitializing</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M74,-267.13C140.42,-267.13 283.73,-267.13 374.7,-267.13"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="374.79,-269.93 382.79,-267.13 374.79,-264.33 374.79,-269.93"/>
+<text text-anchor="start" x="167.5" y="-294.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> isSwitchOn()</text>
+<text text-anchor="start" x="167.5" y="-282.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> play(startupClip)</text>
+<text text-anchor="start" x="167.5" y="-270.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> ParkGait 3000 ms</text>
+</g>
+
+<g id="edge2" class="edge">
+<title>eInitializing&#45;&gt;eOff</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M416.65,-247.51C384.34,-232.56 336.92,-213.2 293,-205.13 236.61,-194.77 219.84,-192.14 164,-205.13 132.12,-212.55 99.03,-229.24 74.76,-243.43"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="73.28,-241.06 67.84,-247.55 76.15,-245.87 73.28,-241.06"/>
+<text text-anchor="start" x="164" y="-232.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> !isSwitchOn()</text>
+<text text-anchor="start" x="164" y="-220.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> setTorqueOff()</text>
+<text text-anchor="start" x="164" y="-208.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> play(shutdownClip)</text>
+</g>
+
+<g id="edge4" class="edge">
+<title>eInitializing&#45;&gt;eInitializing</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M436.1,-286.89C401.16,-330.1 408.13,-390.63 457,-390.63 503.49,-390.63 512.06,-335.87 482.72,-293.34"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="484.94,-291.62 477.9,-286.89 480.45,-294.98 484.94,-291.62"/>
+<text text-anchor="middle" x="457" y="-393.83" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> 60 s: setTorqueOff()</text>
+</g>
+
+<g id="node3" class="node">
+<title>eReady</title>
+<path fill="#fde7d6" stroke="#e8590c" stroke-width="2" d="M979,-286.63C979,-286.63 913,-286.63 913,-286.63 907,-286.63 901,-280.63 901,-274.63 901,-274.63 901,-259.63 901,-259.63 901,-253.63 907,-247.63 913,-247.63 913,-247.63 979,-247.63 979,-247.63 985,-247.63 991,-253.63 991,-259.63 991,-259.63 991,-274.63 991,-274.63 991,-280.63 985,-286.63 979,-286.63"/>
+<text text-anchor="middle" x="946" y="-263.43" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.00">eReady</text>
+</g>
+
+<g id="edge3" class="edge">
+<title>eInitializing&#45;&gt;eReady</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M531.17,-267.13C630.46,-267.13 805.46,-267.13 892.62,-267.13"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="892.77,-269.93 900.77,-267.13 892.77,-264.33 892.77,-269.93"/>
+<text text-anchor="start" x="621" y="-282.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> isLinkHealthy()</text>
+<text text-anchor="start" x="621" y="-270.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> re&#45;park if !isAllTorqueOn()</text>
+</g>
+
+<g id="edge5" class="edge">
+<title>eReady&#45;&gt;eReady</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M926.2,-286.89C893.1,-330.1 899.7,-390.63 946,-390.63 989.95,-390.63 998.13,-336.1 970.54,-293.6"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="972.71,-291.81 965.8,-286.89 968.13,-295.04 972.71,-291.81"/>
+<text text-anchor="middle" x="946" y="-393.83" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> 60 s: setTorqueOff()</text>
+</g>
+
+<g id="node4" class="node">
+<title>eStanding</title>
+<path fill="#fff3bf" stroke="#b58b00" stroke-width="2" d="M1437,-286.63C1437,-286.63 1346,-286.63 1346,-286.63 1340,-286.63 1334,-280.63 1334,-274.63 1334,-274.63 1334,-259.63 1334,-259.63 1334,-253.63 1340,-247.63 1346,-247.63 1346,-247.63 1437,-247.63 1437,-247.63 1443,-247.63 1449,-253.63 1449,-259.63 1449,-259.63 1449,-274.63 1449,-274.63 1449,-280.63 1443,-286.63 1437,-286.63"/>
+<text text-anchor="middle" x="1391.5" y="-263.43" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.00">eStanding</text>
+</g>
+
+<g id="edge6" class="edge">
+<title>eReady&#45;&gt;eStanding</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M991.15,-267.13C1069.73,-267.13 1234.2,-267.13 1325.65,-267.13"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="1325.73,-269.93 1333.73,-267.13 1325.73,-264.33 1325.73,-269.93"/>
+<text text-anchor="start" x="1081" y="-282.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> joyL &amp;&amp; canChangeGait()</text>
+<text text-anchor="start" x="1081" y="-270.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> StandUpGait 3000 ms</text>
+</g>
+
+<g id="edge7" class="edge">
+<title>eStanding&#45;&gt;eReady</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M1345.64,-247.52C1317.14,-236.15 1279.13,-222.96 1244,-217.13 1172.53,-205.27 1152.29,-204.27 1081,-217.13 1051.66,-222.43 1020.36,-233.76 995.4,-244.29"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="994.11,-241.8 987.86,-247.53 996.32,-246.95 994.11,-241.8"/>
+<text text-anchor="start" x="1105" y="-232.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> 30 s idle</text>
+<text text-anchor="start" x="1105" y="-220.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> ParkGait 3000 ms</text>
+</g>
+
+<g id="node5" class="node">
+<title>eWalking</title>
+<path fill="#d9f2e0" stroke="#2b8a3e" stroke-width="2" d="M1906,-533.63C1906,-533.63 1823,-533.63 1823,-533.63 1817,-533.63 1811,-527.63 1811,-521.63 1811,-521.63 1811,-506.63 1811,-506.63 1811,-500.63 1817,-494.63 1823,-494.63 1823,-494.63 1906,-494.63 1906,-494.63 1912,-494.63 1918,-500.63 1918,-506.63 1918,-506.63 1918,-521.63 1918,-521.63 1918,-527.63 1912,-533.63 1906,-533.63"/>
+<text text-anchor="middle" x="1864.5" y="-510.43" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.00">eWalking</text>
+</g>
+
+<g id="edge8" class="edge">
+<title>eStanding&#45;&gt;eWalking</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M1398.58,-286.92C1413.75,-332.5 1457.99,-444.6 1539,-492.13 1620.31,-539.85 1733.59,-534.68 1802.55,-525.32"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="1803.21,-528.05 1810.74,-524.16 1802.42,-522.51 1803.21,-528.05"/>
+<text text-anchor="start" x="1556" y="-557.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> any axis != 0 ||</text>
+<text text-anchor="start" x="1556" y="-545.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> joyR || switch2</text>
+<text text-anchor="start" x="1556" y="-533.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> walkingGaits[i]</text>
+</g>
+
+<g id="node6" class="node">
+<title>ePosing</title>
+<path fill="#e3e9fb" stroke="#3a56a8" stroke-width="2" d="M1901.5,-286.63C1901.5,-286.63 1827.5,-286.63 1827.5,-286.63 1821.5,-286.63 1815.5,-280.63 1815.5,-274.63 1815.5,-274.63 1815.5,-259.63 1815.5,-259.63 1815.5,-253.63 1821.5,-247.63 1827.5,-247.63 1827.5,-247.63 1901.5,-247.63 1901.5,-247.63 1907.5,-247.63 1913.5,-253.63 1913.5,-259.63 1913.5,-259.63 1913.5,-274.63 1913.5,-274.63 1913.5,-280.63 1907.5,-286.63 1901.5,-286.63"/>
+<text text-anchor="middle" x="1864.5" y="-263.43" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.00">ePosing</text>
+</g>
+
+<g id="edge11" class="edge">
+<title>eStanding&#45;&gt;ePosing</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M1449.31,-267.13C1540.07,-267.13 1716.71,-267.13 1807.16,-267.13"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="1807.37,-269.93 1815.37,-267.13 1807.37,-264.33 1807.37,-269.93"/>
+<text text-anchor="start" x="1576" y="-282.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> switch3</text>
+<text text-anchor="start" x="1576" y="-270.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> PosingGait</text>
+</g>
+
+<g id="node7" class="node">
+<title>eStandingLeveled</title>
+<path fill="#e3e9fb" stroke="#3a56a8" stroke-width="2" d="M1939,-39.63C1939,-39.63 1790,-39.63 1790,-39.63 1784,-39.63 1778,-33.63 1778,-27.63 1778,-27.63 1778,-12.63 1778,-12.63 1778,-6.63 1784,-0.63 1790,-0.63 1790,-0.63 1939,-0.63 1939,-0.63 1945,-0.63 1951,-6.63 1951,-12.63 1951,-12.63 1951,-27.63 1951,-27.63 1951,-33.63 1945,-39.63 1939,-39.63"/>
+<text text-anchor="middle" x="1864.5" y="-16.43" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="14.00">eStandingLeveled</text>
+</g>
+
+<g id="edge13" class="edge">
+<title>eStanding&#45;&gt;eStandingLeveled</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M1415.75,-247.61C1443.74,-224.71 1492.78,-186.54 1539,-160.13 1625.82,-110.53 1733.61,-67.35 1800.48,-42.51"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="1801.5,-45.12 1808.03,-39.72 1799.55,-39.87 1801.5,-45.12"/>
+<text text-anchor="start" x="1579.5" y="-175.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> switch4</text>
+<text text-anchor="start" x="1579.5" y="-163.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> LevelGait</text>
+</g>
+
+<g id="edge9" class="edge">
+<title>eWalking&#45;&gt;eStanding</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M1826.14,-494.54C1740.34,-449.55 1529.48,-338.97 1437.09,-290.52"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="1438.24,-287.96 1429.85,-286.72 1435.64,-292.92 1438.24,-287.96"/>
+<text text-anchor="start" x="1539" y="-435.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> 15 s idle &amp;&amp; !switch2</text>
+<text text-anchor="start" x="1539" y="-423.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> StandUpGait 1000 ms</text>
+</g>
+
+<g id="edge10" class="edge">
+<title>eWalking&#45;&gt;eWalking</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M1841.58,-533.89C1803.27,-577.1 1810.91,-637.63 1864.5,-637.63 1915.58,-637.63 1924.91,-582.65 1892.51,-540.08"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="1894.67,-538.29 1887.42,-533.89 1890.34,-541.85 1894.67,-538.29"/>
+<text text-anchor="middle" x="1864.5" y="-640.83" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> joyR: ++gait index</text>
+</g>
+
+<g id="edge15" class="edge">
+<title>eWalking&#45;&gt;ePosing</title>
+<path fill="none" stroke="#3a56a8" stroke-width="1.5" stroke-dasharray="5,2" d="M1864.5,-494.59C1864.5,-450.99 1864.5,-345.68 1864.5,-295.13"/>
+<polygon fill="#3a56a8" stroke="#3a56a8" stroke-width="1.5" points="1867.3,-294.93 1864.5,-286.93 1861.7,-294.93 1867.3,-294.93"/>
+<text text-anchor="start" x="1781.5" y="-393.83" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#3a56a8"> switch3 &amp;&amp; !switch2</text>
+<text text-anchor="start" x="1781.5" y="-381.83" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#3a56a8"> PosingGait</text>
+</g>
+
+
+<g id="edge17" class="edge">
+<title>eWalking&#45;&gt;eStandingLeveled</title>
+<path fill="none" stroke="#3a56a8" stroke-width="1.5" stroke-dasharray="5,2" d="M1827.93,-494.5C1769.63,-460.85 1657.7,-385.99 1613.5,-286.13 1565.12,-176.82 1723.64,-84.43 1810.92,-43.19"/>
+<polygon fill="#3a56a8" stroke="#3a56a8" stroke-width="1.5" points="1812.3,-45.64 1818.36,-39.71 1809.93,-40.56 1812.3,-45.64"/>
+<text text-anchor="start" x="1674.07" y="-493.03" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#3a56a8">switch4 &amp;&amp; !switch2</text>
+<text text-anchor="start" x="1674.07" y="-481.03" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#3a56a8">LevelGait</text>
+<text text-anchor="middle" x="1738.57" y="-469.03" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#3a56a8"> &#160;</text>
+</g>
+
+<g id="edge12" class="edge">
+<title>ePosing&#45;&gt;eStanding</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M1815.48,-249.54C1780.64,-237.75 1732.08,-223.29 1688,-217.13 1622.41,-207.97 1604.33,-206.29 1539,-217.13 1506.89,-222.46 1472.37,-233.94 1444.91,-244.56"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="1443.78,-241.99 1437.36,-247.52 1445.83,-247.2 1443.78,-241.99"/>
+<text text-anchor="start" x="1545.5" y="-232.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> !switch3</text>
+<text text-anchor="start" x="1545.5" y="-220.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> StandUpGait 1000 ms</text>
+</g>
+
+
+<g id="edge14" class="edge">
+<title>eStandingLeveled&#45;&gt;eStanding</title>
+<path fill="none" stroke="#606874" stroke-width="1.5" d="M1777.82,-4.6C1708.63,3.41 1611.23,4.05 1539,-38.13 1460.82,-83.79 1417.55,-189.6 1400.77,-239.78"/>
+<polygon fill="#606874" stroke="#606874" stroke-width="1.5" points="1398.03,-239.15 1398.21,-247.62 1403.35,-240.89 1398.03,-239.15"/>
+<text text-anchor="start" x="1545.5" y="-53.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> !switch4</text>
+<text text-anchor="start" x="1545.5" y="-41.33" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#2e343b"> StandUpGait 1000 ms</text>
+</g>
+
+<g id="edge16" class="edge">
+<title>eStandingLeveled&#45;&gt;ePosing</title>
+<path fill="none" stroke="#3a56a8" stroke-width="1.5" stroke-dasharray="5,2" d="M1883.62,-39.91C1942.91,-107.12 1944.58,-174.32 1888.62,-241.52"/>
+<polygon fill="#3a56a8" stroke="#3a56a8" stroke-width="1.5" points="1886.48,-239.71 1883.39,-247.61 1890.73,-243.36 1886.48,-239.71"/>
+<text text-anchor="start" x="1893.8" y="-63.23" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#3a56a8"> &#160;switch3</text>
+<text text-anchor="start" x="1893.8" y="-51.23" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="11.00" fill="#3a56a8"> &#160;PosingGait</text>
+</g>
+</g>
+</svg>
+<svg x="8.00" y="726.00" width="477.00" height="447.00" viewBox="1.44 1.44 475.08 445.08" overflow="visible">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(5.76 440.76)">
+<title>note</title>
+<polygon fill="white" stroke="transparent" points="-4.32,4.32 -4.32,-439.32 469.32,-439.32 469.32,4.32 -4.32,4.32"/>
+
+<g id="node1" class="node">
+<title>note</title>
+<polygon fill="#fffdf3" stroke="#b58b00" stroke-width="1.4" points="459,-435 0,-435 0,0 465,0 465,-429 459,-435"/>
+<polyline fill="none" stroke="#b58b00" stroke-width="1.4" points="459,-435 459,-429 "/>
+<polyline fill="none" stroke="#b58b00" stroke-width="1.4" points="465,-429 459,-429 "/>
+<text text-anchor="start" x="27.5" y="-404.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-weight="bold" font-size="12.00">Transitions common to the four active states</text>
+<text text-anchor="start" x="27.5" y="-384.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00">from </text>
+<text text-anchor="start" x="60.5" y="-384.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">eStanding, eWalking, ePosing, eStandingLeveled</text>
+<text text-anchor="start" x="27.5" y="-363.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> </text>
+<text text-anchor="start" x="27.5" y="-344.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">joyL</text>
+<text text-anchor="start" x="58.5" y="-344.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> → </text>
+<text text-anchor="start" x="76.5" y="-344.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">ParkGait</text>
+<text text-anchor="start" x="137.5" y="-344.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> 3000 ms → </text>
+<text text-anchor="start" x="210.5" y="-344.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">eReady</text>
+<text text-anchor="start" x="27.5" y="-323.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00" fill="#c92a2a">!isLinkHealthy() || !isSwitchOn()</text>
+<text text-anchor="start" x="27.5" y="-304.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> &#160;&#160;→ </text>
+<text text-anchor="start" x="52.5" y="-304.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">handleConnectionLoss(true)</text>
+<text text-anchor="start" x="248.5" y="-304.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> → </text>
+<text text-anchor="start" x="266.5" y="-304.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">eInitializing</text>
+<text text-anchor="start" x="27.5" y="-284.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> &#160;&#160;the same from </text>
+<text text-anchor="start" x="131.5" y="-284.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">eReady</text>
+<text text-anchor="start" x="177.5" y="-284.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00">, but with </text>
+<text text-anchor="start" x="237.5" y="-284.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">(false)</text>
+<text text-anchor="start" x="290.5" y="-284.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00">:</text>
+<text text-anchor="start" x="27.5" y="-263.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> &#160;&#160;no gait is running there to interrupt</text>
+<text text-anchor="start" x="27.5" y="-243.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> </text>
+<text text-anchor="start" x="27.5" y="-224.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-weight="bold" font-size="12.00">Guards</text>
+<text text-anchor="start" x="27.5" y="-204.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">isLinkHealthy()</text>
+<text text-anchor="start" x="140.5" y="-204.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> = </text>
+<text text-anchor="start" x="158.5" y="-204.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">isPaired()</text>
+<text text-anchor="start" x="234.5" y="-204.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> &amp;&amp;</text>
+<text text-anchor="start" x="27.5" y="-184.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> &#160; </text>
+<text text-anchor="start" x="39.5" y="-184.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">timeSinceLastControlData()</text>
+<text text-anchor="start" x="235.5" y="-184.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> ≤ 250 ms</text>
+<text text-anchor="start" x="27.5" y="-164.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">canChangeGait()</text>
+<text text-anchor="start" x="140.5" y="-164.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> gates every handler except</text>
+<text text-anchor="start" x="27.5" y="-144.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> &#160; </text>
+<text text-anchor="start" x="39.5" y="-144.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">stepWalking()</text>
+<text text-anchor="start" x="137.5" y="-144.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00">, so a state change there takes</text>
+<text text-anchor="start" x="27.5" y="-123.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> &#160;&#160;effect at once while the gait switch defers</text>
+<text text-anchor="start" x="27.5" y="-103.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> </text>
+<text text-anchor="start" x="27.5" y="-84.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-weight="bold" font-size="12.00">Constants</text>
+<text text-anchor="start" x="97.5" y="-84.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> — </text>
+<text text-anchor="start" x="117.5" y="-84.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">Hexapod.cpp</text>
+<text text-anchor="start" x="27.5" y="-64.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">cParkDurationMs</text>
+<text text-anchor="start" x="140.5" y="-64.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> 3000 · </text>
+<text text-anchor="start" x="186.5" y="-64.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">cStandUpFromParkedMs</text>
+<text text-anchor="start" x="337.5" y="-64.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> 3000</text>
+<text text-anchor="start" x="27.5" y="-44.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">cStandUpDeployedMs</text>
+<text text-anchor="start" x="163.5" y="-44.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> 1000 · </text>
+<text text-anchor="start" x="209.5" y="-44.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">cIdleTimeout</text>
+<text text-anchor="start" x="300.5" y="-44.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> 15000</text>
+<text text-anchor="start" x="27.5" y="-24.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">cWaitTimeUntilTorqueOff</text>
+<text text-anchor="start" x="200.5" y="-24.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> 60000 · </text>
+<text text-anchor="start" x="253.5" y="-24.9" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="12.00">cControlDataTimeoutMs</text>
+<text text-anchor="start" x="411.5" y="-24.9" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="12.00"> 250</text>
+</g>
+</g>
+</svg>
+</svg>

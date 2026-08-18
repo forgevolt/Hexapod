@@ -4,6 +4,8 @@
 |---|---|
 | [`QUICKSTART.md`](QUICKSTART.md) | Quick guide - one page, for anyone handed the robot |
 | [`MANUAL.md`](MANUAL.md) | Operating manual - servo setup, every control, troubleshooting |
+| `state-machine-detail.md` | The state machine with guards, gaits and constants from `Hexapod.cpp` |
+| `state-machine.svg`, `state-machine-detail.svg` | The same two diagrams as SVG, if you prefer them to the inline Mermaid |
 | `transmitter-controls.jpg` | The annotated transmitter photo the quick guide shows |
 | `hexapod.jpg` | The photograph the top-level README shows |
 | `PCB.jpg` | The assembled controller board, shown in `hardware/README.md` |
