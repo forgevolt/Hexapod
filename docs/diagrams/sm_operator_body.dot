@@ -1,0 +1,32 @@
+digraph hexapod {
+  rankdir=TB; bgcolor="white"; splines=spline;
+  nodesep=1.1; ranksep=1.25; pad=0.35;
+  node [shape=box, style="rounded,filled", fillcolor="#F5F6F8", color="#3A4048",
+        fontname="DejaVu Sans Bold", fontsize=15, penwidth=2, margin="0.30,0.17", height=0.5];
+  edge [fontname="DejaVu Sans", fontsize=12, color="#606874", fontcolor="#2E343B", penwidth=1.6, arrowsize=0.85];
+
+  Off          [label="Off",          fillcolor="#E7E9EC"];
+  Initializing [label="Initializing", fillcolor="#FDE7D6", color="#E8590C"];
+  Ready        [label="Ready",        fillcolor="#FDE7D6", color="#E8590C"];
+  Standing     [label="Standing",     fillcolor="#FFF3BF", color="#B58B00"];
+  Walking      [label="Walking",      fillcolor="#D9F2E0", color="#2B8A3E"];
+  Posing       [label="Posing",       fillcolor="#E3E9FB", color="#3A56A8"];
+  Balancing    [label="Balancing",    fillcolor="#E3E9FB", color="#3A56A8"];
+
+  Off -> Initializing    [label="power switch on"];
+  Initializing -> Off    [label="power switch off"];
+  Initializing -> Ready  [label="transmitter paired"];
+  Ready -> Standing      [label="left button"];
+  Standing -> Ready      [label="left button\l30 s idle\l"];
+  Standing -> Walking    [label="move a stick"];
+  Walking -> Standing    [label="15 s idle"];
+  Walking -> Walking     [label="  right button: next gait"];
+  Standing -> Posing     [label="Switch 3 on"];
+  Posing -> Standing     [label="Switch 3 off"];
+  Standing -> Balancing  [label="Switch 4 on"];
+  Balancing -> Standing  [label="Switch 4 off"];
+
+  { rank=same; Walking; Posing; Balancing; }
+  Walking -> Posing [style=invis]; Posing -> Balancing [style=invis];
+
+}

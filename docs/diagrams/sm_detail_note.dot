@@ -1,0 +1,29 @@
+digraph note {
+  bgcolor="white"; margin=0.02; pad=0.06;
+  note [shape=note, style="filled", fillcolor="#FFFDF3", color="#B58B00", penwidth=1.4,
+        fontname="DejaVu Sans", fontsize=12, margin="0.30,0.22",
+        label=<<table border="0" cellborder="0" cellspacing="3">
+        <tr><td align="left"><b>Transitions common to the four active states</b></td></tr>
+        <tr><td align="left">from&#160;<font face="DejaVu Sans Mono">eStanding, eWalking, ePosing, eStandingLeveled</font></td></tr>
+        <tr><td align="left"> </td></tr>
+        <tr><td align="left"><font face="DejaVu Sans Mono">joyL</font>&#160;&#8594;&#160;<font face="DejaVu Sans Mono">ParkGait</font>&#160;3000 ms &#8594;&#160;<font face="DejaVu Sans Mono">eReady</font></td></tr>
+        <tr><td align="left"><font color="#C92A2A"><font face="DejaVu Sans Mono">!isLinkHealthy() || !isSwitchOn()</font></font></td></tr>
+        <tr><td align="left">   &#8594;&#160;<font face="DejaVu Sans Mono">handleConnectionLoss(true)</font>&#160;&#8594;&#160;<font face="DejaVu Sans Mono">eInitializing</font></td></tr>
+        <tr><td align="left">   the same from&#160;<font face="DejaVu Sans Mono">eReady</font>, but with&#160;<font face="DejaVu Sans Mono">(false)</font>:</td></tr>
+        <tr><td align="left">   no gait is running there to interrupt</td></tr>
+        <tr><td align="left"> </td></tr>
+        <tr><td align="left"><b>Guards</b></td></tr>
+        <tr><td align="left"><font face="DejaVu Sans Mono">isLinkHealthy()</font>&#160;=&#160;<font face="DejaVu Sans Mono">isPaired()</font>&#160;&amp;&amp;</td></tr>
+        <tr><td align="left">  &#160;<font face="DejaVu Sans Mono">timeSinceLastControlData()</font>&#160;&#8804; 250 ms</td></tr>
+        <tr><td align="left"><font face="DejaVu Sans Mono">canChangeGait()</font>&#160;gates every handler except</td></tr>
+        <tr><td align="left">  &#160;<font face="DejaVu Sans Mono">stepWalking()</font>, so a state change there takes</td></tr>
+        <tr><td align="left">   effect at once while the gait switch defers</td></tr>
+        <tr><td align="left"> </td></tr>
+        <tr><td align="left"><b>Constants</b>&#160;&#8212;&#160;<font face="DejaVu Sans Mono">Hexapod.cpp</font></td></tr>
+        <tr><td align="left"><font face="DejaVu Sans Mono">cParkDurationMs</font>&#160;3000 &#183;&#160;<font face="DejaVu Sans Mono">cStandUpFromParkedMs</font>&#160;3000</td></tr>
+        <tr><td align="left"><font face="DejaVu Sans Mono">cStandUpDeployedMs</font>&#160;1000 &#183;&#160;<font face="DejaVu Sans Mono">cIdleTimeout</font>&#160;15000</td></tr>
+        <tr><td align="left"><font face="DejaVu Sans Mono">cWaitTimeUntilTorqueOff</font>&#160;60000 &#183;&#160;<font face="DejaVu Sans Mono">cControlDataTimeoutMs</font>&#160;250</td></tr>
+        </table>>];
+  
+
+}

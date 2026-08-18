@@ -1,0 +1,14 @@
+digraph note {
+  bgcolor="white"; margin=0.02; pad=0.06;
+  note [shape=note, style="filled", fillcolor="#FFFDF3", color="#B58B00", penwidth=1.4,
+        fontname="DejaVu Sans", fontsize=12.5, margin="0.28,0.20",
+        label=<<table border="0" cellborder="0" cellspacing="3">
+        <tr><td align="left"><b>From Standing, Walking, Posing or Balancing</b></td></tr>
+        <tr><td align="left">the&#160;<b>left button</b>&#160;parks the robot &#8594; Ready</td></tr>
+        <tr><td align="left">a&#160;<b>lost link</b>&#160;or the&#160;<b>power switch off</b>&#160;&#8594; Initializing</td></tr>
+        <tr><td align="left"> </td></tr>
+        <tr><td align="left">Switch 3 and Switch 4 also work&#160;<b>while walking</b>,</td></tr>
+        <tr><td align="left">and Switch 3 works while balancing.</td></tr>
+        </table>>];
+
+}

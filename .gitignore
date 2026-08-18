@@ -1,6 +1,11 @@
 # Reference material and working files that are not part of the published project
 do_not_publish/
 
+# Intermediates from docs/diagrams/build.sh - the composed SVGs in docs/ are the output
+docs/diagrams/.build/
+docs/diagrams/*_body.svg
+docs/diagrams/*_note.svg
+
 # macOS
 .DS_Store
 ._*

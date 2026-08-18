@@ -3,6 +3,9 @@
 Every state, guard, gait and timeout in `software/Hexapod/Hexapod.cpp`. For the same machine
 in operating terms, see [the manual](MANUAL.md#the-five-things-it-does).
 
+The Mermaid below is the source. [`state-machine-detail.svg`](state-machine-detail.svg) is the
+same diagram exported for printing - **if you change one, change the other.**
+
 ```mermaid
 flowchart LR
     Off["eOff"] -->|"isSwitchOn()<br>play(startupClip)<br>ParkGait 3000 ms"| Init["eInitializing"]
@@ -63,3 +66,14 @@ All in `Hexapod.cpp`.
 | `cIdleTimeout` | 15000 |
 | `cWaitTimeUntilTorqueOff` | 60000 |
 | `cControlDataTimeoutMs` | 250 |
+
+## Regenerating the SVGs
+
+Both SVGs are built with graphviz from the sources in [`diagrams/`](diagrams), then composed
+so the note sits below the graph - `dot` lays nodes out by rank and cannot place a note
+underneath a left-to-right graph on its own.
+
+```
+cd docs/diagrams
+./build.sh          # needs graphviz and python3
+```

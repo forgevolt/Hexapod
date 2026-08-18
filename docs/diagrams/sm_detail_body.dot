@@ -1,0 +1,40 @@
+digraph hexapod_detail {
+  rankdir=LR; bgcolor="white"; splines=spline;
+  nodesep=1.45; ranksep=2.5; pad=0.35;
+  node [shape=box, style="rounded,filled", fillcolor="#F5F6F8", color="#3A4048",
+        fontname="DejaVu Sans Mono Bold", fontsize=14, penwidth=2, margin="0.28,0.16", height=0.5];
+  edge [fontname="DejaVu Sans Mono", fontsize=11, color="#606874", fontcolor="#2E343B", penwidth=1.5, arrowsize=0.8];
+
+  eOff             [label="eOff",             fillcolor="#E7E9EC"];
+  eInitializing    [label="eInitializing",    fillcolor="#FDE7D6", color="#E8590C"];
+  eReady           [label="eReady",           fillcolor="#FDE7D6", color="#E8590C"];
+  eStanding        [label="eStanding",        fillcolor="#FFF3BF", color="#B58B00"];
+  eWalking         [label="eWalking",         fillcolor="#D9F2E0", color="#2B8A3E"];
+  ePosing          [label="ePosing",          fillcolor="#E3E9FB", color="#3A56A8"];
+  eStandingLeveled [label="eStandingLeveled", fillcolor="#E3E9FB", color="#3A56A8"];
+
+  eOff -> eInitializing [label=" isSwitchOn()\l play(startupClip)\l ParkGait 3000 ms\l"];
+  eInitializing -> eOff [label=" !isSwitchOn()\l setTorqueOff()\l play(shutdownClip)\l"];
+  eInitializing -> eReady [label=" isLinkHealthy()\l re-park if !isAllTorqueOn()\l"];
+  eInitializing -> eInitializing [label=" 60 s: setTorqueOff()"];
+  eReady -> eReady [label=" 60 s: setTorqueOff()"];
+
+  eReady -> eStanding    [label=" joyL && canChangeGait()\l StandUpGait 3000 ms\l"];
+  eStanding -> eReady    [label=" 30 s idle\l ParkGait 3000 ms\l"];
+  eStanding -> eWalking  [label=" any axis != 0 ||\l joyR || switch2\l walkingGaits[i]\l"];
+  eWalking -> eStanding  [label=" 15 s idle && !switch2\l StandUpGait 1000 ms\l"];
+  eWalking -> eWalking   [label=" joyR: ++gait index"];
+  eStanding -> ePosing          [label=" switch3\l PosingGait\l"];
+  ePosing -> eStanding          [label=" !switch3\l StandUpGait 1000 ms\l"];
+  eStanding -> eStandingLeveled [label=" switch4\l LevelGait\l"];
+  eStandingLeveled -> eStanding [label=" !switch4\l StandUpGait 1000 ms\l"];
+
+  edge [color="#3A56A8", fontcolor="#3A56A8", style=dashed];
+  eWalking -> ePosing          [label=" switch3 && !switch2\l PosingGait\l", constraint=false];
+  eStandingLeveled -> ePosing  [taillabel="  switch3\l  PosingGait\l", labeldistance=5.5, labelangle=-30, constraint=false];
+  eWalking -> eStandingLeveled [taillabel="switch4 && !switch2\lLevelGait\l  ", labeldistance=9.0, labelangle=-24, constraint=false];
+
+  { rank=same; eWalking; ePosing; eStandingLeveled; }
+  edge [style=invis]; eWalking -> ePosing; ePosing -> eStandingLeveled;
+
+}
