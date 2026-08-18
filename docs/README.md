@@ -2,6 +2,9 @@
 
 | Path | Contents |
 |---|---|
+| [`QUICKSTART.md`](QUICKSTART.md) | Quick guide - one page, for anyone handed the robot |
+| [`MANUAL.md`](MANUAL.md) | Operating manual - servo setup, every control, troubleshooting |
+| `transmitter-controls.jpg` | The annotated transmitter photo the quick guide shows |
 | `hexapod.jpg` | The photograph the top-level README shows |
 | `PCB.jpg` | The assembled controller board, shown in `hardware/README.md` |
 | `test-harness1.jpg`, `test-harness2.jpg` | The bring-up harness, shown in `hardware/README.md` |

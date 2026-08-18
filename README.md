@@ -64,9 +64,16 @@ it. The schematic is in [`hardware/schematic.pdf`](hardware/schematic.pdf).
 | [`software/`](software) | The firmware sketch, plus the bring-up and calibration sketches |
 | [`hardware/`](hardware) | PCB: EasyEDA project, Gerbers, schematic, bill of materials |
 | [`mechanics/`](mechanics) | Chassis and legs: Fusion source, STLs, dimensioned drawings |
-| [`docs/`](docs) | Photographs and the inverse-kinematics write-up |
+| [`docs/`](docs) | Photographs, the manuals, and the inverse-kinematics write-up |
 
 Each of those has its own README.
+
+### Manuals
+
+| | |
+|---|---|
+| **[Quick guide](docs/QUICKSTART.md)** | One page, for anyone handed the robot. Controls, what the lights mean, what is normal |
+| **[Operating manual](docs/MANUAL.md)** | The full version: servo setup, every control in every mode, timeouts, troubleshooting |
 
 ## Getting started
 
