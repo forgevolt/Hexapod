@@ -112,7 +112,7 @@ against:
 | MPU6050_light | 1.2.1 | by rfetick - several MPU6050 libraries exist, this is the one used here |
 | U8g2 | 2.36.19 | |
 | Streaming | 6.3.0 | |
-| [SoundEngine](https://github.com/forgevolt/SoundEngine) | 1.0.0 | I2S mixing and the compiled-in clips |
+| [SoundEngine](https://github.com/forgevolt/SoundEngine) | 1.1.0 | I2S mixing and the compiled-in clips |
 | [ESPNowUtilities](https://github.com/forgevolt/ESPNowUtilities) | 1.0.0 | the ESP-NOW transport `RCProtocol.h` is built on |
 
 The last two are written for this project and its transmitter. Both are in the Arduino
