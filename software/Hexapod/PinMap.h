@@ -21,4 +21,3 @@ constexpr int cDXL_TX    = 17;
 // Misc
 constexpr int cOnOffSwitchPin = 48;
 constexpr int cUSBSensePin    = 10;
-
