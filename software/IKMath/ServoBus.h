@@ -45,7 +45,7 @@ inline float tickToRad(int32_t tick)
 //   - Performing high-performance synchronous reads (SyncRead) for position,
 //     velocity, or current feedback if needed.
 //
-// Hardware: 18 x Dynamixel XC430-W240-T on a single half-duplex bus, powered from a 3S LiPo.
+// Hardware: 18 x Dynamixel XC430-T240BB-T on a single half-duplex bus, powered from a 3S LiPo.
 //   Gear ratio     245.22 : 1
 //   Stall torque   1.9 [N.m]      (at 12.0 [V])
 //   No load speed   70 [rev/min]  (at 12.0 [V]) -> 70 * 4096 / 60 = 4'778 ticks/sec
