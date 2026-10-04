@@ -6,15 +6,15 @@
 // ---- Leg -------------------------------------------------------------------------------
 
 // Leg segment geometry constants (in millimeters) measured between servo output shafts
-constexpr float cCoxaLength  = 42.441f;  // Coxa to femur joint distance 
+constexpr float cCoxaLength  = 42.35f;   // Coxa to femur joint distance 
 constexpr float cFemurLength = 95.0f;    // Femur length
-constexpr float cTibiaLength = 172.95f;  // Tibia length (joint to foot)
+constexpr float cTibiaLength = 174.981f; // Tibia length (joint to foot)
 
 // Leg geometry angle offsets (radians).
 // These angles compensate for bends in the femur and tibia segments
 // and are applied relative to the neutral (zero-angle) joint configuration.
 constexpr float cFemurOffsetAngleRad = 17.2f * deg2rad;
-constexpr float cTibiaOffsetAngleRad = -9.7f * deg2rad;
+constexpr float cTibiaOffsetAngleRad = -8.7f * deg2rad;
 
 // ----------------------------------------------------------------------------------------
 Leg::Leg(LegId id, ServoBus& servoBus, size_t coxaServoIdx, size_t femurServoIdx, size_t tibiaServoIdx)
@@ -27,27 +27,27 @@ Leg::Leg(LegId id, ServoBus& servoBus, size_t coxaServoIdx, size_t femurServoIdx
   switch (id)
   {
     case LegId::LF:
-      myOffset = Vector3(82.399, 53.5, 14.95);
-      myYaw    = 33.0f * deg2rad; // == yaw = atan2f(53.5, 82.399)
+      myOffset = Vector3(82.399, 53.511, 15.05);
+      myYaw    = 33.0f * deg2rad; // == yaw = atan2f(53.511, 82.399)
       break;
     case LegId::LM:
-      myOffset = Vector3(0, 87.25, 14.95);
+      myOffset = Vector3(0, 87.25, 15.05);
       myYaw    = 90.0f * deg2rad;
       break;
     case LegId::LR:
-      myOffset = Vector3(-82.399, 53.5, 14.95);
+      myOffset = Vector3(-82.399, 53.511, 15.05);
       myYaw    = 147.0f * deg2rad;
       break;
     case LegId::RF:
-      myOffset = Vector3(82.399, -53.5, 14.95); 
+      myOffset = Vector3(82.399, -53.511, 15.05); 
       myYaw    = -33.0f * deg2rad; 
       break;
     case LegId::RM:
-      myOffset = Vector3(0, -87.25, 14.95); 
+      myOffset = Vector3(0, -87.25, 15.05); 
       myYaw    = -90.0f * deg2rad;
       break;
     case LegId::RR:
-      myOffset = Vector3(-82.399, -53.5, 14.95);
+      myOffset = Vector3(-82.399, -53.511, 15.05);
       myYaw    = -147.0f * deg2rad; 
       break;
     default:
