@@ -97,7 +97,7 @@ for exactly that, and the order to run them in is in that folder's README.
 
 ## Building
 
-Built with the **Arduino IDE**, using the **esp32 core 3.3.11** (IDF v5.5.5). It does not
+Built with the **Arduino IDE**, using the **esp32 core 3.3.12** (IDF v5.5.5). It does not
 compile against core 2.x.
 
 ### Libraries
@@ -108,7 +108,7 @@ against:
 | Library | Version | Note |
 | --- | --- | --- |
 | FastLED | 3.10.5 | |
-| Dynamixel2Arduino | 0.8.1 | |
+| Dynamixel2Arduino | 0.8.2 | |
 | MPU6050_light | 1.2.1 | by rfetick - several MPU6050 libraries exist, this is the one used here |
 | U8g2 | 2.36.19 | |
 | Streaming | 6.3.0 | |
