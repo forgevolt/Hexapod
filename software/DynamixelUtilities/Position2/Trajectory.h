@@ -23,7 +23,7 @@ public:
         cp2 = c2;
     }
 
-    // t in Sekunden
+    // t in seconds
     float evaluate(float t) {
         if (t <= 0) return p0;
         if (t >= duration) return p1;
@@ -59,7 +59,7 @@ private:
     }
 
     float minjerk(float u) {
-        // Smoothstart/stop: 10u³ - 15u⁴ + 6u⁵
+        // Smooth start/stop: 10u³ - 15u⁴ + 6u⁵
         float u2 = u * u;
         float u3 = u2 * u;
         float u4 = u3 * u;

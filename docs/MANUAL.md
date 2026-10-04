@@ -86,7 +86,7 @@ always the authority. This is what those labels mean.
 | **Switch 2** | `Adjust Gait` | Hold: the right stick tunes step length, height and ground clearance instead of steering |
 | **Switch 3** | `Posing` | On: pose the body with the feet planted |
 | **Switch 4** | `Balance` | On: the robot levels itself against the ground |
-| **Left button** | `Standup` / `Park` | Stands up from parked, or parks from anything else |
+| **Left button** | `Stand up` / `Park` | Stands up from parked, or parks from anything else |
 | **Right button** | `Change Gait` | While walking, cycles tripod → tetrapod → ripple |
 
 A button label is **blank whenever the button does nothing** — during a stand-up or park
@@ -120,7 +120,7 @@ between `cMinDurationMS` and `cMaxDurationMS`. Push gently and it walks slowly.
 3. **The LEDs pulse red** and the eyes look tired. The robot is waiting for the transmitter.
 4. **Pairing happens by itself.** The robot broadcasts, the transmitter answers. Once frames
    are flowing the eyes open to their normal state and the robot is ready.
-5. **Press the left button** (`Standup`) to stand.
+5. **Press the left button** (`Stand up`) to stand.
 
 Nothing needs to be switched on in a particular order. If the transmitter is already on when
 the robot boots, pairing completes as soon as the robot is up.
@@ -165,7 +165,7 @@ flowchart TD
 |---|---|---|
 | **Off** | on/off switch off | Torque released, display blank |
 | **Initializing** | power on, or the link drops | Legs folding to parked; controls ignored |
-| **Ready** | parked, transmitter paired | On the ground, waiting. `Standup` available |
+| **Ready** | parked, transmitter paired | On the ground, waiting. `Stand up` available |
 | **Standing** | left button from Ready | Legs deployed, chassis level, ready to walk |
 | **Walking** | move a stick from Standing | Gait running |
 | **Posing** | Switch 3 | Feet planted, body moves |

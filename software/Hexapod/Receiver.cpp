@@ -240,7 +240,7 @@ void Receiver::setMessage(size_t idx, const char* label, const char* message)
 {
   if (idx >= cNumMessages)
   {
-    Serial << __PRETTY_FUNCTION__  << " -> idx out of range " << idx << endl;
+    Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> idx out of range: " << idx << endl;
     return; 
   }
 
@@ -328,7 +328,7 @@ void Receiver::onPairingResponseMsg(const PairingResponseData& pd, const uint8_t
   // myMutex here for the same reason as in sendHeartbeat() above.
   if (setPeer(src, pd.device, pd.name) == false)
   {
-    Serial << __PRETTY_FUNCTION__ << " -> Failed to set peer " << mac2string(src) << endl;
+    Serial << __PRETTY_FUNCTION__ << " -> failed to set peer " << mac2string(src) << endl;
     return;
   }
 
@@ -375,7 +375,7 @@ void Receiver::onAppMsg(uint8_t msgType, const void* data, size_t len, const Pee
     static unsigned long lastInvalidLengMs = 0;
     if (logDue(lastInvalidLengMs) == true)
     {
-      Serial << __PRETTY_FUNCTION__ << " -> invalid len for TransmitterData: " << len
+      Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> invalid len for TransmitterData: " << len
             << ", expecting: " << sizeof(TransmitterData) << endl;
     }
     return;
@@ -386,7 +386,7 @@ void Receiver::onAppMsg(uint8_t msgType, const void* data, size_t len, const Pee
     static unsigned long lastVersionLogMs = 0;
     if (logDue(lastVersionLogMs) == true)
     {
-      Serial << __PRETTY_FUNCTION__ << " -> app protocol version mismatch: received "
+      Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> app protocol version mismatch: received "
             << int(td.protocolVersion) << ", expected " << int(cAppProtocolVersion)
             << " - the two ends were built from different revisions of RCProtocol.h" << endl;
     }

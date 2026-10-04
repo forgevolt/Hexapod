@@ -48,7 +48,7 @@ inline float tickToRad(int32_t tick)
 // Hardware: 18 x Dynamixel XC430-T240BB-T on a single half-duplex bus, powered from a 3S LiPo.
 //   Gear ratio     245.22 : 1
 //   Stall torque   1.9 [N.m]      (at 12.0 [V])
-//   No load speed   70 [rev/min]  (at 12.0 [V]) -> 70 * 4096 / 60 = 4'778 ticks/sec
+//   No-load speed   70 [rev/min]  (at 12.0 [V]) -> 70 * 4096 / 60 = 4'778 ticks/sec
 //   Input voltage  6.5 ~ 14.8 [V] (recommended 12.0 [V])
 //
 // That ticks/sec figure is the ceiling on how fast a joint can actually follow a command: at

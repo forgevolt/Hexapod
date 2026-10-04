@@ -57,7 +57,7 @@ void setup()
   dxl.torqueOff(cDXL_ID_TIBIA);
   dxl.setOperatingMode(cDXL_ID_TIBIA, OP_POSITION);
 
-  Serial.println("Setup Complete. Starting ...");
+  Serial.println("Setup complete. Starting ...");
 }
 
 

@@ -1,5 +1,5 @@
 // ---- I2S test --------------------------------------------------------------------------
-// Plays a simple tone sequence to test I2S amplifier 
+// Plays a simple tone sequence to test the I2S amplifier 
 //
 
 #include <Arduino.h>

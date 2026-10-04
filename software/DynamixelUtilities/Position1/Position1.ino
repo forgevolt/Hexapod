@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------------------------
-// Position — Changes the position of a single servo with a smooth transition between points 
-//            without stopping (decelerating).
-//            Method: way points, blend threshold, dxl.getPresentPosition to check if target 
-//                    reached
+// Position1 — Changes the position of a single servo with a smooth transition between points 
+//             without stopping (decelerating).
+//             Method: waypoints, blend threshold, dxl.getPresentPosition to check if target 
+//                     reached
 //           
 //            Christoph Streit - 2025
 // ---------------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ const int total_points = sizeof(waypoints) / sizeof(waypoints[0]);
 
 int current_index = 0;
 
-// The speed you want to maintain (RPM or units depends on model, usually 0.229 RPM/unit)
+// The speed you want to maintain (the unit depends on the model, usually 0.229 RPM/unit)
 // 200 is a moderate speed. Max varies by model.
 #define TRAVEL_SPEED  0 
 
@@ -78,8 +78,8 @@ void setup()
   // 4. MAXIMIZE TORQUE SETTINGS
   // Get the model's maximum rated current (from EEPROM)
   // Note: Be careful. Running at max torque for long periods generates heat.
-  // We read the Max Current Limit (Addr 38 is usually the limit setting, 
-  // we can read the read-only Max Limit at Addr 16/Model Spec, but here we assume a high value).
+  // We read the Max Current Limit (Addr 38 is usually the limit setting. The read-only
+  // maximum could be read at Addr 16 / Model Spec, but here we assume a high value.)
   // For an XM430, 1193 is usually max current. We set it high.
   // !!! dxl.writeControlTableItem(ADDR_CURRENT_LIMIT, cDXL_ID, 1193); 
 
@@ -105,7 +105,7 @@ void setup()
   //dxl.writeControlTableItem(PROFILE_VELOCITY, cDXL_ID, 50);
 
 
-  Serial.println("Setup Complete. Starting Motion...");
+  Serial.println("Setup complete. Starting motion...");
 }
 
 void loop() 
@@ -131,7 +131,7 @@ void loop()
     int32_t distance_left = abs(current_target - current_pos);
 
     // 4. "The Hand-off": If we are close to the target, switch to the next one IMMEDIATELY
-    // This prevents the internal profile form triggering the deceleration phase.
+    // This prevents the internal profile from triggering the deceleration phase.
     // if ((dxl.readControlTableItem(MOVING_STATUS, cDXL_ID)&1) == 1) { 
     if (distance_left < BLEND_THRESHOLD) {
       

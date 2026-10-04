@@ -43,7 +43,7 @@ bool StatusDisplay::begin(uint8_t fps)
 
   myDisplay.setFont(cTextFont);
 
-  // Centre the gaze, and start with the eyes shut so the first frames tween them open.
+  // Center the gaze, and start with the eyes shut so the first frames tween them open.
   myPosXTarget = constraintX() / 2;
   myPosYTarget = constraintY() / 2;
   myPosX       = myPosXTarget;
@@ -385,7 +385,7 @@ void StatusDisplay::drawEyes()
     myHeightR = tween(myHeightR, myHeightTargetR + growthR);
   }
 
-  // Each eye keeps a fixed centre line derived from its target height, so blinking and
+  // Each eye keeps a fixed center line derived from its target height, so blinking and
   // curiosity growth expand and collapse symmetrically instead of dragging the eye down.
   const int centreYL = myPosY + myHeightTargetL / 2;
   const int centreYR = myPosY + myHeightTargetR / 2;
@@ -447,7 +447,7 @@ void StatusDisplay::drawMoodMask(int x, int y, int width, int height, bool isLef
 
   myDisplay.setDrawColor(cBgColor);
 
-  // The mask reaches a little beyond the eye, so the rasterised edge of a diagonal cannot
+  // The mask reaches a little beyond the eye, so the rasterized edge of a diagonal cannot
   // leave a lit sliver in the rounded corner it is meant to cut away. The overshoot is kept
   // inside the buffer: u8g2 takes unsigned coordinates, and a negative one would wrap to a
   // huge value rather than clip.
@@ -479,7 +479,7 @@ void StatusDisplay::drawMoodMask(int x, int y, int width, int height, bool isLef
       break;
 
     // The lower part of the eye is reshaped into a smiling squint. See drawHappyLid() for
-    // the candidate shapes.
+    // the shape.
     case Mood::eHappy:
       drawHappyLid(x, y, width, height);
       break;
@@ -492,12 +492,12 @@ void StatusDisplay::drawMoodMask(int x, int y, int width, int height, bool isLef
 
 // ----------------------------------------------------------------------------------------
 // The happy arc: a band of constant thickness whose lower edge is lifted furthest from the
-// eye's bottom edge at the centre, so it arches. Everything above and below it is masked.
+// eye's bottom edge at the center, so it arches. Everything above and below it is masked.
 //
 // Drawn as one background column per pixel of eye width rather than with u8g2's ellipse,
 // which takes unsigned coordinates and would wrap for an eye near the left edge. The profile
-// is measured from the eye's true centre, (width - 1) / 2, so the arc is symmetric: width / 2
-// would leave it one column off centre.
+// is measured from the eye's true center, (width - 1) / 2, so the arc is symmetric: width / 2
+// would leave it one column off center.
 void StatusDisplay::drawHappyLid(int x, int y, int width, int height)
 {
   if (width <= 1 || height <= 0)

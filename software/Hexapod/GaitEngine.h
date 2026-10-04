@@ -105,8 +105,8 @@ class GaitEngine
     void step(float dt_ms, const Receiver::ControlData& input);
 
     // Request a new gait
-    // Note, that for locomotion gaits, durationMS should be omitted since the phase duration is based on 
-    // joystick movements
+    // Note that for locomotion gaits durationMS should be omitted, since the cycle duration
+    // follows the joystick.
     void requestGait(Gait* gait, float durationMS = cMaxDurationMS);
 
     Gait* currentGait() { return myActiveGait; }
@@ -149,7 +149,7 @@ class GaitEngine
     GaitParams myLiveParams;   // myParams with myClearanceTrim applied; see step()
 
     // Transient ground-clearance offset in mm, driven by RY while a locomotion gait is
-    // active and switch 1 is not held. Never written back to myParams.
+    // active and SWITCH 2 is not held. Never written back to myParams.
     float myClearanceTrim = 0.0f;
 
 };

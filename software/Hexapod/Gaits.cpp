@@ -52,7 +52,7 @@ void ParkGait::update(float phase, const GaitEngine::MotionCmd&)
 
   for (std::size_t i = 0; i < cNumLegs; i++)
   {
-    // The path is a cubic Bezier. lerp(), smoothstep() and minjerk() in MathUtilities.h are
+    // The path is a cubic Bézier. lerp(), smoothstep() and minjerk() in MathUtilities.h are
     // simpler alternatives over the same start/target pair.
 
     // Define the trajectory
@@ -91,7 +91,7 @@ void ParkGait::cycleComplete()
 
 // ----------------------------------------------------------------------------------------
 StandUpGait::StandUpGait(Hexapod& hexapod)
-: Gait(hexapod, "Standup") 
+: Gait(hexapod, "Stand up") 
 {}
 
 // ----------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ void StandUpGait::update(float phase, const GaitEngine::MotionCmd&)
   float t = smootherstep(phase);
 
   // Below this distance, legs are already close enough to their target that a simple
-  // minjerk curve looks fine; above it, use the two-stage bezier lift-and-place path
+  // minjerk curve looks fine; above it, use the two-stage Bézier lift-and-place path
   // so far-traveling legs don't drag across the ground on the way up.
   constexpr float cMinjerkDistanceThresholdMM = 10.0f;
 
@@ -172,7 +172,7 @@ void StandUpGait::update(float phase, const GaitEngine::MotionCmd&)
 
       // P2: Already at the target X/Y, hovering directly above P3
       Vector3 p2 = p3;
-      p2.z = p3.z + 30.0f; // Hover 30mm above the final spot
+      p2.z = p3.z + 30.0f; // Hover 30 mm above the final spot
 
       Vector3 pos = bezier3(p0, p1, p2, p3, t);
       myHexapod.leg(i).setPosition(pos);
@@ -213,7 +213,7 @@ void PosingGait::update(float, const GaitEngine::MotionCmd& cmd)
                 GaitEngine::cNeutralPosition[i].y,
                 params.groundClearance);
 
-    // bodyPos (rotation and translation) is clamped by GaitEngine. 
+    // cmd.pose (rotation and translation) is clamped by GaitEngine. 
     //   cMinPoseTranslation, cMaxPoseTranslation
     //   cMinPoseRotation, cMaxPoseRotation
     // Therefore, the values are not constrained here
@@ -313,7 +313,7 @@ namespace
     return (d > 0.5f) ? d - 1.0f : d;
   }
 
-  // Signed distance from the body centre to the edge of the polygon spanned by the planted
+  // Signed distance from the body center to the edge of the polygon spanned by the planted
   // feet: positive inside, negative outside. Gift wrapping, because this is never called with
   // more than five points and it needs no allocation and no sort.
   float supportMargin(const Vector2* pts, std::size_t n)
@@ -370,7 +370,7 @@ namespace
         continue;
 
       // cross of the edge with the vector to the origin; the hull runs counter-clockwise, so
-      // a negative value puts the body centre outside this edge
+      // a negative value puts the body center outside this edge
       const float cross = ex * (0.0f - a.y) - ey * (0.0f - a.x);
 
       if (cross < 0.0f)
@@ -544,7 +544,7 @@ Vector3 GenericWalkingGait::footPosition(std::size_t leg, float legPhase, float 
   // How hard the robot is being asked to move, 0 at rest and 1 at full command. The stride in
   // force and the operator's own demand are both consulted, and the larger wins: the two do not
   // fall to zero at the same moment. Reversing at speed sends the stride through zero a filter
-  // time-constant after the stick passed centre, and taking the stride alone would read that as
+  // time constant after the stick passed center, and taking the stride alone would read that as
   // a standing robot and drop all six feet to the floor for the length of the crossing.
   const float demand = max(cmd.demand,
                            max((cmd.linear.length() / params.stepLength),
@@ -566,7 +566,7 @@ Vector3 GenericWalkingGait::footPosition(std::size_t leg, float legPhase, float 
   // Safety buffer (mm): the swing aims this far above the ground and the stance settles the
   // last of it, so the foot is never driven into the floor. Faded out by liftRamp along with
   // the lift itself, so a stationary robot rests every foot at groundClearance rather than a
-  // few millimetres shy of it. Tune the 5 mm per gait if needed.
+  // few millimeters shy of it. Tune the 5 mm per gait if needed.
   const float cTouchdownOffset = 5.0f * liftRamp;
 
   // Fraction of the stance phase spent lowering the foot from cTouchdownOffset to the ground.
@@ -594,7 +594,7 @@ Vector3 GenericWalkingGait::footPosition(std::size_t leg, float legPhase, float 
     t = 0.5f * (1.0f - cosf(t * cPI)); // Sine ease-in-out
 
     // Calculate the multiplier to ensure the curve actually peaks at currentStepHeight
-    // For a cubic Bezier, 1.333f is the magic number to hit the target at t=0.5
+    // For a cubic Bézier, 1.333f is the magic number to hit the target at t=0.5
     float controlHeight = (currentStepHeight * 1.333f);
 
     Vector3 p0 = swingStart;
@@ -622,13 +622,13 @@ Vector3 GenericWalkingGait::footPosition(std::size_t leg, float legPhase, float 
     // against each other through the ground and scrub.
     //
     // Tripod hides this: its three stance legs always share one phase, so the ease cancels
-    // out. Ripple's five stance legs sit at five different points on the curve, and the
-    // fastest and slowest differ by 95% of full speed.
+    // out. Ripple's stance legs sit at different points on the curve: with the sixth-of-a-cycle
+    // swing it used when this was measured, the fastest and slowest differed by 95% of full speed.
     const float t = tRaw;
 
     // Linear interpolation on the ground (Front to Back). 
     // However, instead of a straight line, we move from End to Start by reversing the command.
-    // This ensures the foot follows the same arc it took in the air and is more natural
+    // This ensures the foot follows the same arc it took in the air and is more natural.
 
     float currentYaw = lerpf(cmd.yaw / 2.0f, -cmd.yaw / 2.0f, t);
     Vector2 currentLinear = lerp(cmd.linear / 2.0f, -cmd.linear / 2.0f, t);
@@ -638,9 +638,8 @@ Vector3 GenericWalkingGait::footPosition(std::size_t leg, float legPhase, float 
     pos.y += currentLinear.y;
 
     // If we are in the first 10% of the stance, smoothly lower from Offset to Ground.
-    // Deliberately keyed off tRaw (not the eased t above) - this is an independent,
-    // short fixed-duration touchdown-settling window, not tied to the horizontal
-    // ease curve.
+    // Keyed off tRaw: this is an independent, short, fixed-duration touchdown-settling
+    // window.
     if (tRaw < cTouchdownSettleFraction)
     {
       pos.z = lerpf(params.groundClearance + cTouchdownOffset, params.groundClearance,
@@ -654,7 +653,7 @@ Vector3 GenericWalkingGait::footPosition(std::size_t leg, float legPhase, float 
 
   // Bank into the turn. Applied as a vertical shear rather than a rotation of the body: a
   // rotation would swing a planted foot sideways, while shearing z against the foot's own
-  // lateral position tilts the body about its centre line and leaves every footprint exactly
+  // lateral position tilts the body about its center line and leaves every footprint exactly
   // where it was. Feet on the inside of the turn end up nearer the body, which sets that side
   // of the body down.
   //
@@ -669,7 +668,7 @@ Vector3 GenericWalkingGait::footPosition(std::size_t leg, float legPhase, float 
   // its own, so a bank that would ask a leg to stand higher than cMinGroundClearance or reach
   // further than cMaxGroundClearance flattens off on that side instead. Held at full up-trim
   // there is no headroom left at all, and the bank becomes the outer side dropping alone -
-  // still a roll, just about the inner feet rather than the centre line.
+  // still a roll, just about the inner feet rather than the center line.
   // cTouchdownOffset is already spent above the clearance by a foot about to land, so it comes
   // out of the headroom too. Floored at zero because the trim can leave none at all, in which
   // case the bank is whatever the outer side can still give.
@@ -722,8 +721,8 @@ void GenericWalkingGait::update(float phase, const GaitEngine::MotionCmd& cmd)
 // ----------------------------------------------------------------------------------------
 bool GenericWalkingGait::canChange() const 
 {
-  // Parking, posing and levelling wait for the cycle boundary. A change to another *walking*
-  // gait does not come through here at all: the engine recognises it as a morph and hands
+  // Parking, posing and leveling wait for the cycle boundary. A change to another *walking*
+  // gait does not come through here at all: the engine recognizes it as a morph and hands
   // this gait's live pattern to the incoming one.
   return floatEquals(myCurrentPhase, 0.0f);   
 }

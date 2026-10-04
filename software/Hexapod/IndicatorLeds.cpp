@@ -12,7 +12,7 @@ constexpr uint8_t  cPulseMinBrightness = 20;    // Dimmest point of the pulse (0
 
 constexpr float    cSweepSpeed         = 1.3f;  // Pixels advanced per frame (lower = slower)
 constexpr uint8_t  cSweepTailLength    = 7;     // Number of LEDs in the fading tail
-constexpr CRGB     cSweepColor         = CRGB(220, 60, 0); // Warm orange-red comet colour
+constexpr CRGB     cSweepColor         = CRGB(220, 60, 0); // Warm orange-red comet color
 
 
 // ---- IndicatorLeds ---------------------------------------------------------------------
@@ -94,7 +94,7 @@ void IndicatorLeds::runPulseOrange()
   if (myPulsePhase >= 2.0f * M_PI)
     myPulsePhase -= 2.0f * M_PI;
 
-  // Map sin() from [-1, 1] to [cPulseMinBrightness, 255] and scale the sweep colour.
+  // Map sin() from [-1, 1] to [cPulseMinBrightness, 255] and scale the sweep color.
   float   sineValue  = (sinf(myPulsePhase) + 1.0f) * 0.5f; // 0.0 – 1.0
   uint8_t brightness = cPulseMinBrightness
                      + static_cast<uint8_t>(sineValue * (255 - cPulseMinBrightness));
@@ -154,13 +154,13 @@ void IndicatorLeds::runSweepMeetInMiddle()
   if (!isFrameDue(cSweepIntervalMs * 2))
     return;
 
-  // Left comet travels forward  from index 0   → centre
-  // Right comet travels backward from index N-1 → centre
-  // Both share mySweepPos as the distance travelled from their respective ends.
+  // Left comet travels forward  from index 0   → center
+  // Right comet travels backward from index N-1 → center
+  // Both share mySweepPos as the distance traveled from their respective ends.
   constexpr float cMidPoint = static_cast<float>(cNumLeds) / 2.0f - 0.5f;
 
   // Once the heads meet at the midpoint they park there while the cycle runs on for a few
-  // more frames, shortening the tails so the trails retract into the centre. drawComet()
+  // more frames, shortening the tails so the trails retract into the center. drawComet()
   // divides by tailLength, so the tail must shorten to 1 and never to 0.
   constexpr float cDrainFrames = static_cast<float>(cSweepTailLength - 1);
   constexpr float cCycleEnd    = cMidPoint + cDrainFrames;

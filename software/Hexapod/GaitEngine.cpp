@@ -36,14 +36,14 @@ static_assert(cStepLengthRatePerS > 0.0f && cGroundClearanceRatePerS > 0.0f &&
 
 // Exponential stick response for the tuning axes, in the shape RC transmitters use: a cubic
 // blended with a little linear. Gentle deflections stay slow and the axis maximum is reached
-// only at the stops, which is what makes millimetre corrections possible.
+// only at the stops, which is what makes millimeter corrections possible.
 //
 // cTuningExpo is the cubic's share of the blend: 0 is a plain linear map, 1 a pure cubic. The
 // linear remainder is what keeps the response alive just past the deadzone.
 constexpr float cTuningExpo = 0.7f;
 
 static_assert(cTuningExpo >= 0.0f && cTuningExpo <= 1.0f,
-              "cTuningExpo outside [0, 1] makes the response non-monotonic near centre");
+              "cTuningExpo outside [0, 1] makes the response non-monotonic near center");
 
 
 // Curvature of the stride response to stick deflection. The stride is magDirection raised to
@@ -76,7 +76,7 @@ constexpr float cDemandReleaseMS = 300.0f;
 constexpr float cFinishDurationFactor = 2.0f;
 
 // ----------------------------------------------------------------------------------------
-// Signed millimetres per second for the given axis deflection.
+// Signed millimeters per second for the given axis deflection.
 static float shapedRate(int axis, float ratePerS)
 {
   const float span   = static_cast<float>(cJoystickMax - cTuningDeadzone);
@@ -113,13 +113,13 @@ void GaitEngine::resetParams()
 void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
 {
   // Only logs once per violation (not every call) so a genuine
-  // invariant break is still loud without spamming the log at 200Hz forever.
+  // invariant break is still loud without spamming the log at 200 Hz forever.
   if (myActiveGait == nullptr) 
   {
     static bool warned = false;
     if (warned == false)
     {
-      Serial << __PRETTY_FUNCTION__ << " -> no active gait" << endl;
+      Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> no active gait" << endl;
       warned = true;
     }
     return;
@@ -148,7 +148,7 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
     myCurrentMotion.pose.translation.z = lowPassFilter(myCurrentMotion.pose.translation.z, distance,
                                                        200.0f, dt_ms); // ~1 s to effectively settle (~5×tau) 
 
-    // Roll and Pitch IMU based?
+    // Roll and pitch IMU-based?
     if (input.switch4 == true)
     {
       angle = std::clamp(input.angleX*deg2rad, cMinPoseRotation, cMaxPoseRotation);
@@ -221,12 +221,12 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
     myLinearX = lowPassFilter(myLinearX, input.LX, 25.0f, dt_ms);
     myLinearY = lowPassFilter(myLinearY, input.LY, 25.0f, dt_ms);
 
-    // Invert joystick x-value to match the coordinate system (right handed)
+    // Invert joystick x-value to match the coordinate system (right-handed)
     Vector2 direction = circularNormalization(-myLinearX / cJoystickMax, myLinearY / cJoystickMax);
     float magDirection = direction.length();
 
-    // When SWITCH 2 is false: RX (-> 2-joy transmitter) or LZ (1-joy transmitter) rotate hexapod 
-    // around its vertical axis (yaw)
+    // When SWITCH 2 is false: RX (-> 2-joy transmitter) or LZ (1-joy transmitter) rotates the
+    // hexapod around its vertical axis (yaw)
     static ESPNowConnection::PeerInfo peerInfo;
     float inputRotation = 0.0f;
     if (myHexapod.receiver().getPeerInfo(peerInfo) == true && peerInfo.device == eTransmitter1Joy)
@@ -241,7 +241,7 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
     // As magDirection approaches 1.0, the influence of magRotation is scaled down.
     float magnitude = magDirection + (magRotation * (1.0f - magDirection));
 
-    // Clamp to ensure floating point precision doesn't exceed 1.0
+    // Clamp so floating-point rounding cannot push it past 1.0
     magnitude = std::clamp(magnitude, 0.0f, 1.0f);
 
     // The fastest cycle this gait is allowed to run. Guarded rather than trusted: a config with
@@ -253,7 +253,7 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
                             : cMaxDurationMS;
 
     // The operator's raw axes, not the filtered magnitude: Joystick3Axis returns exactly 0 at
-    // centre, while the filters only approach it asymptotically. Only the raw value can tell
+    // center, while the filters only approach it asymptotically. Only the raw value can tell
     // that the stick has been released.
     const bool isCommanded = (input.LX != 0 || input.LY != 0 ||
                               (input.switch2 == false && input.RX != 0));
@@ -305,7 +305,7 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
     // ------------------------------------------------------------------------
     // Rotation Logic: Maps joystick Z-axis to angular rotation (Yaw).
     // cMaxYaw defines the max rotation per cycle.
-    // Lerp alpha (0.01f) defines the "softness" of the acceleration.
+    // The low-pass time constant (500 ms) defines the "softness" of the acceleration.
     // ------------------------------------------------------------------------
 
     // Target yaw based on joystick position
@@ -356,8 +356,8 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
   // reaches cMinGroundClearance one way and cMaxGroundClearance the other, and centring the
   // stick returns the robot to the tuned clearance.
   //
-  // The trim is never written back to myParams. Anything that is not a locomotion gait, and
-  // holding SWITCH 2, ease it back to zero.
+  // The trim is never written back to myParams. Outside a locomotion gait, or while SWITCH 2
+  // is held, it eases back to zero.
   float targetTrim = 0.0f;
 
   if (isLocomotion == true && input.switch2 == false)
@@ -452,7 +452,7 @@ void GaitEngine::trySwitchGait()
     // fraction of the previous session's stride. Cleared here so the robot starts from standstill.
     //
     // Not applied when switching between walking gaits. That currently cannot happen mid-stride
-    // anyway (canChange() requires phase 0, which requires input to have stopped), but keeps the
+    // anyway (canChange() requires phase 0, which requires input to have stopped), but it keeps the
     // reset correct if walking gaits ever become switchable mid-cycle.
     const bool wasLocomotion = (myActiveGait != nullptr &&
                                 myActiveGait->getCategory() == GaitCategory::eLocomotion);

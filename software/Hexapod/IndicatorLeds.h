@@ -14,7 +14,7 @@ constexpr uint8_t  cLedBrightness = 20;  // Global brightness cap (0-255)
 //
 // Usage:
 //   IndicatorLeds leds;
-//   void setup() { leds.begin(); leds.setEffect(Effect::eSweepForward); }
+//   void setup() { leds.begin<cLedDataPin>(); leds.setEffect(IndicatorLeds::Effect::eSweepForward); }
 //   void loop()  { leds.update(); }
 //
 // Switching effects at any time is safe — the cycle always restarts cleanly.
@@ -63,7 +63,7 @@ class IndicatorLeds
     // Returns true when the next frame interval has elapsed and resets the timer.
     bool isFrameDue(uint32_t intervalMs);
 
-    // Draws a comet at fractional position [0.0, N-1] in the given colour.
+    // Draws a comet at fractional position [0.0, N-1] in the given color.
     // tailLength controls how many LEDs form the fading trail.
     // forward=true: tail extends toward lower indices; false: toward higher indices.
     void drawComet(float position, CRGB color, uint8_t tailLength, bool forward);
@@ -87,5 +87,5 @@ class IndicatorLeds
     float myPulsePhase = 3.0f * M_PI / 2.0f; // starts at minimum brightness (sin = -1)
 
     // Sweep state (shared by all sweep effects)
-    float mySweepPos = 0.0f; // distance travelled from the starting end (pixels)
+    float mySweepPos = 0.0f; // distance traveled from the starting end (pixels)
 };

@@ -2,7 +2,7 @@
 
 #include "MathUtilities.h"
 #include "ServoBus.h"
-#include <cstddef>   // std::size_t - used at line 36 and below
+#include <cstddef>   // std::size_t
 #include <atomic>
 
 
@@ -76,7 +76,7 @@ class Leg
 
     // Performs forward kinematics (FK) to calculate the current foot coordinates.
     // Maps the actual servo angles to a 3D position relative to the leg base.
-    // Note: Requires a prior call to ServosBus::syncReadPresentPosition() to refresh local data.
+    // Note: Requires a prior call to ServoBus::syncReadPresentPosition() to refresh local data.
     Vector3 getPresentPosition() const; 
 
     // Similar to getPresentPosition():

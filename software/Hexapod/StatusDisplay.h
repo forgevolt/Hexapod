@@ -49,7 +49,7 @@ class StatusDisplay
 
     explicit StatusDisplay();
 
-    // Bring up the display, centre the eyes, and push the first frame. Returns false if
+    // Bring up the display, center the eyes, and push the first frame. Returns false if
     // the display does not come up, in which case update() still runs harmlessly.
     // fps: target frame rate; clamped to at least 1 to keep the frame interval finite.
     bool begin(uint8_t fps);
@@ -125,7 +125,7 @@ class StatusDisplay
     // actually closes the eye within cBlinkFrames.
     static constexpr int cClosedHeight = 1;
 
-    // How far a mood mask is drawn outside the eye, to keep a rasterised diagonal from
+    // How far a mood mask is drawn outside the eye, to keep a rasterized diagonal from
     // leaving a lit sliver in the corner it cuts away.
     static constexpr int cMaskOvershoot = 2;
 
@@ -174,7 +174,7 @@ class StatusDisplay
     void drawHappyLid(int x, int y, int width, int height);
     void drawCross(int x, int y, int size);
 
-    // Draw text horizontally centred on the given baseline, dropping trailing characters
+    // Draw text horizontally centered on the given baseline, dropping trailing characters
     // until it fits the screen width.
     void drawTextCentred(const char* text, int baselineY);
 

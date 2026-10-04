@@ -37,7 +37,7 @@ constexpr uint32_t cIMUBusClockHz = 400000;
 
 // Transition gait durations. Parking travels the full range from the current pose to the folded
 // position, and standing up from parked covers the same distance. Returning to a plain stand from
-// an already-deployed pose - posing, levelling, or walking - is a shorter move.
+// an already-deployed pose - posing, leveling, or walking - is a shorter move.
 constexpr float cParkDurationMs      = 3000.0f;
 constexpr float cStandUpFromParkedMs = 3000.0f;
 constexpr float cStandUpDeployedMs   = 1000.0f;
@@ -96,11 +96,11 @@ Hexapod::Hexapod(Receiver& receiver)
     myServoBus.configureServo(i, cServoConfig[i].id, cServoConfig[i].minPos, cServoConfig[i].maxPos);
 
   // cWaveGaitConfig and cCrawlGaitConfig are defined in Gaits.h but not enabled here.
-  // Adding either to the initialiser above also requires raising cNumWalkingGaits.
+  // Adding either to the initializer above also requires raising cNumWalkingGaits.
 
   myReceiver.setName("Hexapod");
-  // Slot 1 is SWITCH 1, which opens the transmitter's menu - it shows "Menu" there regardless of
-  // what is sent, so nothing is claimed for it here.
+  // The first slot is SWITCH 1, which opens the transmitter's menu - it shows "Menu" there
+  // regardless of what is sent, so nothing is claimed for it here.
   myReceiver.setSwitchLabels("", "Adjust Gait", "Posing", "Balance");
   myReceiver.setButtonLabels("", "");
 }
@@ -179,14 +179,14 @@ bool Hexapod::begin(bool announceFault)
   myLeds.setEffect(IndicatorLeds::Effect::eNone);
 
   // Not folded into 'result', for the same reason as the sound engine below: only servo
-  // initialisation decides whether begin() succeeds.
+  // initialization decides whether begin() succeeds.
   if (myStatusDisplay.begin(30) == false) // 30 fps, i.e. a 33 ms frame interval
     Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> status display init failed" << endl;
 
   myStatusDisplay.setAutoBlinker(true, 3, 2); // blink every 3 s ± up to 2 s variation
   myStatusDisplay.setIdleMode(true, 2, 2);    // reposition every 2 s ± up to 2 s variation
 
-  // Deliberately not folded into 'result': only servo initialisation determines whether begin()
+  // Deliberately not folded into 'result': only servo initialization determines whether begin()
   // succeeds. A silent robot is not a reason to refuse to walk.
   if (mySound.begin() == false)
     Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> sound engine init failed" << endl;  
@@ -254,7 +254,7 @@ Leg& Hexapod::leg(std::size_t index)
 {
   if (index >= cNumLegs)
   {
-    Serial << __PRETTY_FUNCTION__ << " -> leg index out of range: " << index << endl;
+    Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> leg index out of range: " << index << endl;
     return myLegs[0];
   }
 
@@ -266,7 +266,8 @@ void Hexapod::step(float dt_ms)
 {
   // Accumulates until reset by a state change or by new operator input.
   // Known limitation, accepted by design: float has a 24-bit mantissa, so once this
-  // passes 2^24 ms (~4.7 h).  That needs a single uninterrupted state lasting longer
+  // passes 2^24 ms (~4.7 h) it can no longer hold every millisecond exactly, and the
+  // timeouts start to drift. That needs a single uninterrupted state lasting longer
   // than the ~15 min battery allows, so it is not reachable on this hardware.
   myTimePassedMS += dt_ms;
 
@@ -307,7 +308,7 @@ void Hexapod::step(float dt_ms)
       break;
 
     default:
-      Serial << __PRETTY_FUNCTION__ << " -> invalid case label: " << static_cast<int>(myState) << endl;
+      Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> invalid case label: " << static_cast<int>(myState) << endl;
 
       myGaitEngine.requestGait(&myParkGait, cParkDurationMs);
       changeState(HexapodState::eReady);
@@ -340,8 +341,8 @@ void Hexapod::step(float dt_ms)
 
     const GaitEngine::GaitParams& params = myGaitEngine.params();
 
-    // Reported in whole millimetres. Rounding before the comparison, rather than only in the
-    // format string, means a value drifting within one millimetre does not count as a change -
+    // Reported in whole millimeters. Rounding before the comparison, rather than only in the
+    // format string, means a value drifting within one millimeter does not count as a change -
     // the tuning axes and the clearance trim move these continuously, and every change re-sends
     // all four slots through a mutex the link task also holds.
     const float stepHeight      = roundf(params.stepHeight);
@@ -441,7 +442,7 @@ void Hexapod::stepInitializing()
 // ----------------------------------------------------------------------------------------
 void Hexapod::stepReady()
 {
-  setButtonLabels(myGaitEngine.canChangeGait() ? "Standup" : "", ""); 
+  setButtonLabels(myGaitEngine.canChangeGait() ? "Stand up" : "", ""); 
 
   // Lost connection to transmitter or power switch is off?
   if (isLinkHealthy() == false || isSwitchOn() == false)
@@ -449,7 +450,7 @@ void Hexapod::stepReady()
     handleConnectionLoss(false); // nothing to interrupt: no gait is active in eReady
   }
 
-  // Pressed left button to standup?
+  // Left button pressed to stand up?
   else if (myControlData.joyL == true && myGaitEngine.canChangeGait())
   {
     myControlData.joyL = false; // process button press just once
@@ -457,7 +458,7 @@ void Hexapod::stepReady()
     changeState(HexapodState::eStanding);
   }
 
-  // Idle after 'cWaitTimeUntilTorqueOff' seconds, i.e. turn servo torque off
+  // Idle after cWaitTimeUntilTorqueOff (60 s), i.e. turn servo torque off
   else if (myTimePassedMS > cWaitTimeUntilTorqueOff)
   {
     myTimePassedMS = 0.0f;
@@ -602,13 +603,13 @@ void Hexapod::stepWalking()
   // Walking forward?
   if (myControlData.LY > 0)
   {
-    // LED strip orientation is rotated by 180deg
+    // LED strip orientation is rotated by 180 deg
     myLeds.setEffect(IndicatorLeds::Effect::eSweepBackward);
   }
   // Walking backward?
   else if (myControlData.LY < 0)
   {
-    // LED strip orientation is rotated by 180deg
+    // LED strip orientation is rotated by 180 deg
     myLeds.setEffect(IndicatorLeds::Effect::eSweepForward);
   }
   // Walking sideways or turning?
@@ -642,7 +643,7 @@ void Hexapod::stepWalking()
   // so the robot used to stop walking after cIdleTimeout with the stick still pushed forward.
   //
   // A plain != 0 test is right here. Joystick3Axis on the transmitter applies its own deadzone
-  // and returns exactly 0 at centre, so there is no noise to filter at this end - and a second
+  // and returns exactly 0 at center, so there is no noise to filter at this end - and a second
   // threshold would be actively wrong, since a small deliberate deflection maps to a small
   // non-zero value and must still count as activity.
   if (myControlData.LX != 0 || myControlData.LY != 0 || myControlData.LZ != 0 ||
@@ -686,7 +687,7 @@ void Hexapod::stepWalking()
     changeState(HexapodState::ePosing);
   }
 
-  // Start posing? (adjust gait switch S2 must not be active)
+  // Start balancing (auto-level via onboard IMU)? (adjust gait switch S2 must not be active)
   else if (myControlData.switch4 == true && myControlData.switch2 == false)
   {
     myGaitEngine.requestGait(&myLevelGait);
@@ -844,7 +845,7 @@ void Hexapod::changeEyeConfig(HexapodState newState)
       break;
 
     case HexapodState::eWalking:
-      // led effect is set in stepWalking()
+      // LED effect is set in stepWalking()
       myStatusDisplay.setMood(StatusDisplay::Mood::eFocused);
       myStatusDisplay.setSpaceBetween(15);
       myStatusDisplay.setWidth(45, 45);
@@ -892,7 +893,7 @@ void Hexapod::schedulerTask(void* pvParameters)
   // check stays quiet. Either way a hung control loop reboots rather than leaving the robot
   // torqued up with nothing driving it.
   if (esp_task_wdt_add(nullptr) != ESP_OK)
-    Serial << __PRETTY_FUNCTION__ << " -> esp_task_wdt_add failed - control loop is unguarded" << endl;
+    Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> esp_task_wdt_add failed - control loop is unguarded" << endl;
 
   while (true)
   {
@@ -960,7 +961,7 @@ void Hexapod::peripheralsTask(void* pvParameters)
   // come from a single task - but update() runs here while schedulerTask sets mood, size and look
   // direction via changeEyeConfig() and stepWalking(). Those setters write several members that
   // drawEyes() then reads, so a frame can render a partially applied change: for example the new
-  // mood at the old eye size. That is the entire consequence, it lasts one frame, and serialising
+  // mood at the old eye size. That is the entire consequence: it lasts one frame, and serializing
   // it through a queue or atomics costs more than the defect is worth. Do not extend this to
   // anything whose corruption is not purely cosmetic.
 

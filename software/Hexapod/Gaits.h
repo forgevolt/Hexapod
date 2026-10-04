@@ -49,7 +49,7 @@ class Gait
     // it stands. Gaits that do not walk have no pattern and take no part in this.
     virtual const GaitConfig* activeConfig() const { return nullptr; }
 
-    // Begin from `previous` rather than from this gait's own pattern, blending across over
+    // Begin from `previous` rather than from this gait's own pattern, blending to its own over
     // the following couple of cycles. `cmd` is the motion in force and `phase` the engine's
     // current cycle position; together they fix where the feet will be during the blend, and
     // therefore which blend path keeps the robot best supported. Returning false leaves the
@@ -167,7 +167,7 @@ class LevelGait : public Gait
  
 struct GaitConfig
 {
-  float swingDuration;        // Percentage of cycle leg is in air (0.0 - 1.0)
+  float swingDuration;        // Fraction of the cycle the leg is in the air (0.0 - 1.0)
   float legOffsets[cNumLegs]; // Start phase for each leg (0.0 - 1.0)
 
   // Fraction of the engine's fastest cycle this gait may reach (0.0 - 1.0]. A gait that gives
@@ -217,7 +217,7 @@ const GaitConfig cRippleGaitConfig = {
         5.0f/6.0f,  // RM
         1.0f/6.0f   // RR
     },
-    0.7f // a sixth of the cycle per swing; the servos cannot follow the full rate
+    0.7f // about a third of the cycle per swing; the servos cannot follow the full rate
 };
 
 // maximum stability > speed (Ultra-stable, slow)
@@ -231,7 +231,7 @@ const GaitConfig cWaveGaitConfig = {
         4.0f/6.0f,  // RM
         5.0f/6.0f   // RR
     },
-    0.5f // same swing window as ripple; not enabled in Hexapod.cpp
+    0.5f // a sixth of the cycle per swing; not enabled in Hexapod.cpp
 };
 
 // precise foot placement, climbing, sensors active (Very controlled, precise)

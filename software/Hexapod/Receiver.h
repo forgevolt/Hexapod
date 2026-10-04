@@ -48,8 +48,8 @@ class Receiver : public ESPNowConnection
     // there is nothing for the caller to poll.
     bool begin(uint8_t channel = cDefaultWifiChannel) override;
 
-    // These labels are displayed on the transmitter screen. Use these methods before begin()
-    // and whenever they change.
+    // These labels are displayed on the transmitter screen. Call these before begin()
+    // and whenever the labels change.
     void setName(const char* receiverName);
     void setSwitchLabels(const char* switch1Lbl, const char* switch2Lbl,
                          const char* switch3Lbl, const char* switch4Lbl);
@@ -109,10 +109,10 @@ class Receiver : public ESPNowConnection
     
     // Protects myStatus, myReceiverName, mySwitchLabels/myBtnLabels/myMsgLabels/myMsgInfo,
     // and myData - all of which are written from ESP-NOW callbacks (onPairingResponseMsg,
-    // onAppMsg - WiFi task context) and/or read from loop() (isPaired,
-    // getControlData, sendHeartbeat). Separate from, and no substitute for, the base class's
-    // internal peer lock. Lock ordering rule: never call anything that takes the peer lock
-    // (isPaired(), getPeer(), setPeer(), send()) while holding this one, and never hold this
-    // one across a blocking radio call.
+    // onAppMsg - WiFi task context) or the control task (the set*() calls), and read from
+    // linkTask (autoPairing, sendHeartbeat) or the control task (getControlData). Separate
+    // from, and no substitute for, the base class's internal peer lock. Lock ordering rule:
+    // never call anything that takes the peer lock (isPaired(), getPeer(), setPeer(), send())
+    // while holding this one, and never hold this one across a blocking radio call.
     SemaphoreHandle_t myMutex = nullptr;
 };

@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------------------
-// SetID —  Scans the bus for Dynamixel servos, detects their current baud rate, and 
-//          changes its ID to a desired value.
+// SetID — Scans the bus for a Dynamixel servo, detects its current baud rate, and 
+//         changes its ID to a desired value.
 //           
 //          Christoph Streit - 2025
 // ---------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ void setup()
   DXL_SERIAL.begin(57600, SERIAL_8N1, cRX, cTX); // In Core 3.x, the default pins are 26 and 27. In Core 2.x, the defaults were 16 and 17.
   dxl.setPortProtocolVersion(cDXLProtocolVersion);
 
-  Serial << "Searching Dynamixel servo ..."       << endl 
+  Serial << "Searching for a Dynamixel servo ..." << endl 
          << "-----------------------------------" << endl; 
 
   // For all baud rates

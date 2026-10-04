@@ -23,7 +23,7 @@
 //
 // This class acts as the "Brain" of the robot, integrating several sub-systems:
 // - Real-Time Control: Orchestrates a dedicated FreeRTOS task (schedulerTask) pinned 
-//   to Core 1, targeting a precise 200Hz update rate for smooth servo motion.
+//   to Core 1, targeting a precise 200 Hz update rate for smooth servo motion.
 // - State Machine: Manages high-level behaviors (Initializing -> Ready -> Standing -> Walking/Posing)
 //   with integrated safety transitions and automatic idle timeouts.
 // - Power Management: Monitors activity and automatically disables servo torque 
@@ -37,7 +37,7 @@ class Hexapod
     Hexapod(Receiver& receiver);
     ~Hexapod();
 
-    // announceFault: sound the error tone during startup even when initialisation succeeds.
+    // announceFault: sound the error tone during startup even when initialization succeeds.
     // For conditions detected before the robot exists - e.g. an abnormal reset reason.
     bool begin(bool announceFault = false);
 
@@ -73,7 +73,7 @@ class Hexapod
     // The display and the IMU share one I2C bus and are driven exclusively by an internal
     // peripheralsTask (see .cpp) - update() is called for both automatically. These
     // accessors are for configuration only (setMood(), setLookDirection(), etc.);
-    // do not call imu().update() or statusDisplay().update() from outside this class, that
+    // do not call imu().update() or statusDisplay().update() from outside this class; that
     // would race with peripheralsTask on the same bus.
     MPU6050& imu()                 { return myIMU;           }
     StatusDisplay& statusDisplay() { return myStatusDisplay;  }
@@ -90,9 +90,9 @@ class Hexapod
       eReady,           // Powered and stable; chassis on ground awaiting "Stand" command.
       eStanding,        // Active stance; legs deployed, IK keeping chassis level and upright.
       eStandingLeveled, // Feet planted; onboard IMU actively counters chassis tilt on uneven ground.
-      ePosing,          // Feet planted; adjusting shifting body Roll/Pitch/Yaw and XYZ offsets.
+      ePosing,          // Feet planted; shifting the body's roll/pitch/yaw and XYZ offsets.
       eWalking          // Gait cycle active; coordinating swing/stance phases across all legs.
-                        // Dynamically adjusting step height and length and ground clearance.
+                        // Dynamically adjusting step height, step length and ground clearance.
     };
 
     // step() methods for each state. They handle operator input and state transitions and take
@@ -115,7 +115,7 @@ class Hexapod
 
     void changeEyeConfig(HexapodState newState);
 
-    // Common handling for "transmitter disconnected or power switch turned off",
+    // Common handling for "transmitter disconnected or power switch turned off".
     void handleConnectionLoss(bool requestParkGait);
 
     // Forwards to the receiver only when the labels actually change.
@@ -158,10 +158,10 @@ class Hexapod
 
     IndicatorLeds myLeds;          // LED strip on the hexapod cover
     StatusDisplay myStatusDisplay; // eyes and fault reporting on the OLED screen
-    SoundEngine mySound;           // I2S based sound engine
+    SoundEngine mySound;           // I2S-based sound engine
     MPU6050 myIMU;                 // Onboard IMU, used by LevelGait to keep the body level on uneven terrain
 
-    // schedulerTask calls Hexapod::step() in a fixed interval (target is 200 times/second)
+    // schedulerTask calls Hexapod::step() at a fixed interval (target is 200 times/second)
     static void schedulerTask(void* pvParameters);
     std::atomic<bool> myIsTaskRunning;
     TaskHandle_t      myTaskHandle = nullptr;

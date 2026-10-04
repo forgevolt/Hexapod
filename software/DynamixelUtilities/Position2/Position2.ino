@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------------------------
-// Position — Changes the position of a single servo with a smooth transition between points 
-//            without stopping (decelerating).
-//            Method: Send GoalPosition with high frequency (100-200Hz)
+// Position2 — Changes the position of a single servo with a smooth transition between points 
+//             without stopping (decelerating).
+//             Method: Send GoalPosition at a high rate (100-200 Hz)
 //           
 //            Christoph Streit - 2025
 // ---------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ void setup()
 
   dxl.torqueOn(cDXL_ID);
 
-  Serial.println("Setup Complete. Starting Motion...");
+  Serial.println("Setup complete. Starting motion...");
 }
 
 const float duration = 1.0;

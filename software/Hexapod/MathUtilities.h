@@ -27,7 +27,7 @@ inline float wrapPi(float angleRad)
   return angleRad - cPI;
 }
 
-// An Arduino style map function supporting float
+// An Arduino-style map function supporting float
 // If fromLow == fromHigh (degenerate/zero-width input range), returns toLow rather than
 // dividing by zero - callers passing a fixed input range should ensure it's non-degenerate.
 inline float mapf(float x, float fromLow, float fromHigh, float toLow, float toHigh)
@@ -114,7 +114,7 @@ inline float lowPassFilter(float current, // The current smoothed value (from th
 }
 
 // ---- Vector2 ---------------------------------------------------------------------------
-// 2d vector math. Code is a C++ port from the raylib implementation
+// 2D vector math, ported to C++ from the raylib implementation.
 // Refer to https://github.com/raysan5/raylib
 
 class Vector2
@@ -168,7 +168,7 @@ class Vector2
     Vector2 operator/(const float div) const;
     Vector2& operator/=(const float div);
 
-    // Clamp the components of the vector between
+    // Clamp the components of the vector to [min, max]
     [[nodiscard]] Vector2 clamp(float min, float max) const;
 
     // Normalize provided vector
@@ -177,7 +177,7 @@ class Vector2
     // Calculate vector length
     [[nodiscard]] float length() const;
 
-    // Calculate vector square length
+    // Calculate the vector's squared length
     [[nodiscard]] float lengthSqr() const;
 
   protected:
@@ -197,7 +197,7 @@ inline Vector2 lerp(const Vector2& v1, const Vector2& v2, float u)
   return v1 + (v2 - v1) * u;
 }
 
-// Quadratic Bezier for 2D Vectors
+// Quadratic Bézier for 2D Vectors
 inline Vector2 bezier2(const Vector2& p0, const Vector2& p1, const Vector2& p2, float u) 
 {
   u = std::clamp(u, 0.0f, 1.0f);
@@ -229,7 +229,7 @@ inline Vector2 circularNormalization(float x, float y)
 
 
 // ---- Vector3 ---------------------------------------------------------------------------
-// 3d vector math. Code is a C++ port from the raylib implementation
+// 3D vector math, ported to C++ from the raylib implementation.
 // Refer to https://github.com/raysan5/raylib
 
 class Vector3
@@ -292,16 +292,16 @@ class Vector3
     // Calculate vector length
     [[nodiscard]] float length() const;
 
-    // Calculate vector square length
+    // Calculate the vector's squared length
     [[nodiscard]] float lengthSqr() const;
 
     // Calculate distance between two vectors
     [[nodiscard]] float distance(const Vector3& v) const;
 
-    // Calculate square distance between two vectors
+    // Calculate the squared distance between two vectors
     [[nodiscard]] float distanceSqr(const Vector3& v) const; 
 
-    // Clamp the components of the vector between
+    // Clamp the components of the vector to [min, max]
     [[nodiscard]] Vector3 clamp(float min, float max) const;
 
   protected:
@@ -424,7 +424,7 @@ inline Vector3 minjerk(const Vector3& v1, const Vector3& v2, float u)
   return v1 + (v2 - v1) * s;
 }
 
-// Cubic Bezier Curve interpolation
+// Cubic Bézier curve interpolation
 inline Vector3 bezier3(
   const Vector3& p0, // Start: Where the path begins.
   const Vector3& p1, // Control Point 1: Pulls the curve away from the start.

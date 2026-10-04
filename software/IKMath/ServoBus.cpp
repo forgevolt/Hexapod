@@ -21,19 +21,19 @@ const int16_t cSafePWMRaw  = 442; //  50 %
 // unit of 0.1 V. 99 = 9.9 V = 3.3 V/cell on a 3S LiPo.
 const int32_t cMinVoltageLimit = 99;
 
-// Address and length control table item "Goal Position"
+// Address and length of control table item "Goal Position"
 const uint16_t cGoalPositionAddr = 116;
 const uint16_t cGoalPositionLen  = 4;
 
-// Address and length control table item "Present Position"
+// Address and length of control table item "Present Position"
 const uint16_t cPresentPositionAddr = 132;
 const uint16_t cPresentPositionLen  = 4;
 
-// Address and length control table item "Torque Enable"
+// Address and length of control table item "Torque Enable"
 const uint16_t cTorqueEnableAddr = 64;
 const uint16_t cTorqueEnableLen  = 1;
 
-// Address and length control table item "Goal PWM"
+// Address and length of control table item "Goal PWM"
 const uint16_t cGoalPWMAddr = 100;
 const uint16_t cGoalPWMLen  = 2;
 
@@ -51,7 +51,7 @@ bool ServoBus::begin()
   {
     if (myServos[i].isConfigured == false)
     {
-      Serial << __PRETTY_FUNCTION__ << " -> not all servos are configured, found idx " << i << endl;
+      Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> not all servos are configured, found idx " << i << endl;
       return false;
     }
   }
@@ -103,8 +103,8 @@ bool ServoBus::begin()
     ok &= writeEEPROMItemIfChanged(PWM_LIMIT, myServos[i].id, cPWMLimitRaw);
 
     // ---- RAM items: reset to defaults on every power-up, so these must be written each boot.
-    ok &= myDXL.writeControlTableItem(PROFILE_ACCELERATION, myServos[i].id, 0); // infinite acceleration time(‘0 [msec]’)
-    ok &= myDXL.writeControlTableItem(PROFILE_VELOCITY, myServos[i].id, 0);     // ‘0’ represents an infinite velocity (max speed)
+    ok &= myDXL.writeControlTableItem(PROFILE_ACCELERATION, myServos[i].id, 0); // infinite acceleration time ('0 [msec]')
+    ok &= myDXL.writeControlTableItem(PROFILE_VELOCITY, myServos[i].id, 0);     // '0' represents an infinite velocity (max speed)
 
     ok &= myDXL.writeControlTableItem(POSITION_P_GAIN, myServos[i].id, 400); // default 700, tested with 400
     ok &= myDXL.writeControlTableItem(POSITION_I_GAIN, myServos[i].id, 0);   // default 0
@@ -126,7 +126,7 @@ bool ServoBus::begin()
     // position matching the servo's actual current position.
   }
 
-  // Fill the members of structure to syncWrite using internal packet buffer
+  // Fill the members of the structure to syncWrite using internal packet buffer
   mySyncWriteInfos.packet.p_buf        = nullptr;
   mySyncWriteInfos.packet.is_completed = false;
   mySyncWriteInfos.addr                = cGoalPositionAddr;
@@ -140,7 +140,7 @@ bool ServoBus::begin()
     mySyncWriteXels[i].p_data = (uint8_t*)&mySyncWriteData[i].goal_position;
   } 
 
-  // Fill the members of structure to fastSyncRead using internal user packet buffer
+  // Fill the members of the structure to fastSyncRead using internal user packet buffer
   mySyncReadInfos.packet.p_buf        = nullptr;
   mySyncReadInfos.packet.is_completed = false;
   mySyncReadInfos.addr                = cPresentPositionAddr;
@@ -156,7 +156,7 @@ bool ServoBus::begin()
 
   mySyncReadInfos.is_info_changed = true;
 
-  // Fill the members of structure to syncRead the Torque Enable item, used by isAllTorqueOn()
+  // Fill the members of the structure to syncRead the Torque Enable item, used by isAllTorqueOn()
   myTorqueReadInfos.packet.p_buf        = nullptr;
   myTorqueReadInfos.packet.is_completed = false;
   myTorqueReadInfos.addr                = cTorqueEnableAddr;
@@ -172,7 +172,7 @@ bool ServoBus::begin()
 
   myTorqueReadInfos.is_info_changed = true;
 
-  // Fill the members of structure to syncWrite the Goal PWM item, used by setTorque()
+  // Fill the members of the structure to syncWrite the Goal PWM item, used by setTorque()
   myPWMWriteInfos.packet.p_buf        = nullptr;
   myPWMWriteInfos.packet.is_completed = false;
   myPWMWriteInfos.addr                = cGoalPWMAddr;
@@ -205,7 +205,7 @@ void ServoBus::configureServo(int index, uint8_t id, int32_t minPos, int32_t max
   {
     if (i != index && myServos[i].isConfigured == true && myServos[i].id == id)
     {
-      Serial << __PRETTY_FUNCTION__ << " -> id " << id << " already used by index " << i 
+      Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> id " << id << " already used by index " << i 
              << " -> ignoring configuration for index " << index << endl;
       return;
     }
@@ -230,7 +230,7 @@ void ServoBus::setTorque(int16_t goalPWMRaw)
 
   if (myDXL.syncWrite(&myPWMWriteInfos) == false)
   {
-    Serial << __PRETTY_FUNCTION__ << " -> Goal PWM syncWrite failed, lib error code: "
+    Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> Goal PWM syncWrite failed, lib error code: "
            << myDXL.getLastLibErrCode() << endl;
   }
 
@@ -280,7 +280,7 @@ bool ServoBus::isAllTorqueOn()
 
   for (int i=0; i<cNumServos; i++)
   {
-    // In Dynamixel Protocol, 1 = Enabled, 0 = Disabled
+    // In the Dynamixel protocol, 1 = enabled, 0 = disabled
     if (myTorqueReadData[i].torque_enable != 1)
       return false;
   }
@@ -409,12 +409,12 @@ bool ServoBus::syncReadPresentPosition()
 
   if (recv_cnt == 0)
   {
-    Serial << __PRETTY_FUNCTION__ << " -> dxl.syncRead failed, lib error code: " << myDXL.getLastLibErrCode() << endl;
+    Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> dxl.syncRead failed, lib error code: " << myDXL.getLastLibErrCode() << endl;
     return false;
   }
   else if (recv_cnt < cNumServos)
   {
-    Serial << __PRETTY_FUNCTION__ << " -> dxl.syncRead failed, recv_cnt < cNumServos: " << recv_cnt << endl;
+    Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> dxl.syncRead failed, recv_cnt < cNumServos: " << recv_cnt << endl;
     return false;
   }
 
@@ -431,7 +431,7 @@ bool ServoBus::isValidIndex(int index) const
 {
   if (index < 0 || index >= cNumServos)
   {
-    Serial << __PRETTY_FUNCTION__ << " -> index out of range: " << index << endl;
+    Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> index out of range: " << index << endl;
     return false;
   }
 

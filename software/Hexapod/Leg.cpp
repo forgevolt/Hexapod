@@ -53,7 +53,7 @@ Leg::Leg(LegId id, ServoBus& servoBus, size_t coxaServoIdx, size_t femurServoIdx
     default:
       // Invalid ID: fall back to safe, neutral values rather than leaving myOffset/
       // myYaw however the (non-guaranteed) member defaults left them.
-      Serial << __PRETTY_FUNCTION__ << " -> invalid leg ID: " << static_cast<int>(id) << endl;
+      Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> invalid leg ID: " << static_cast<int>(id) << endl;
       myOffset = Vector3(0, 0, 0);
       myYaw    = 0.0f;
       break;

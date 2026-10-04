@@ -10,7 +10,7 @@ constexpr int cI2S_LRC  = 21;  // Left/Right clock, also known as Frame clock or
 constexpr int cI2C_SDA  = 8;
 constexpr int cI2C_SCL  = 9;
 
-// Neopixels
+// NeoPixels (WS2812B)
 constexpr int cLedDataPin = 11; 
 
 // Dynamixel

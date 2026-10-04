@@ -42,8 +42,8 @@ enum EAppMsgType : uint8_t
 enum EDeviceType : uint8_t
 {
   eUndefined = 0, // must stay 0: the transport defaults the pairing frames' device field to it
-  eTransmitter1Joy, // 1 joystick configuration
-  eTransmitter2Joy, // 2 joysticks configuration
+  eTransmitter1Joy, // 1-joystick configuration
+  eTransmitter2Joy, // 2-joystick configuration
   eHexapod,
   eBalancingCube
 };
@@ -67,7 +67,7 @@ constexpr size_t cNumButtons  = 2;
 constexpr size_t cNumMessages = 4;
 constexpr size_t cLabelLen    = 16;
 
-// ---- Information of the RC transmitter, i.e. joystick values, states of the switches, ...
+// ---- Information from the RC transmitter, e.g. joystick values, states of the switches, ...
 
 struct __attribute__((packed)) TransmitterData
 {
@@ -107,7 +107,8 @@ struct __attribute__((packed)) TelemetryData
   // Up to cNumMessages label/value pairs, e.g. { "height=", "13.4" }
   char messages[cNumMessages][2][cLabelLen] = {};
 
-  // Additional information e.g. position of the servos or vectors, indicating the position of the legs
+  // Planned: additional information, e.g. servo positions or vectors giving the position of
+  // the legs
 };
 
 
