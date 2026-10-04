@@ -82,9 +82,10 @@ Each of those has its own README.
 
 1. Install the required libraries (see **Libraries** below).
 2. Open `software/Hexapod/Hexapod.ino` in the Arduino IDE.
-3. Select board *ESP32S3 Dev Module*, Flash 16 MB, PSRAM **OPI PSRAM** (8 MB).
-4. Partition Scheme: **Custom**.
-5. Upload.
+3. Select board *ESP32S3 Dev Module* and set the Tools menu as listed under **Board
+   settings** below. Four entries differ from the defaults: Flash Size **16 MB**, PSRAM
+   **OPI PSRAM** (8 MB), Partition Scheme **Custom** and USB CDC On Boot **Enabled**.
+4. Upload.
 
 `software/Hexapod/partitions.csv` sits in the sketch folder, and the ESP32 core picks it up
 in preference to the Tools menu: a 6 MB application partition plus a 9.8 MB LittleFS
@@ -99,6 +100,37 @@ for exactly that, and the order to run them in is in that folder's README.
 
 Built with the **Arduino IDE**, using the **esp32 core 3.3.12** (IDF v5.5.5). It does not
 compile against core 2.x.
+
+### Board settings
+
+Board *ESP32S3 Dev Module*, with these Tools-menu settings. The four in bold differ from the
+board's defaults.
+
+| Tools menu | Setting |
+| --- | --- |
+| USB CDC On Boot | **Enabled** |
+| CPU Frequency | 240MHz (WiFi) |
+| Core Debug Level | None |
+| USB DFU On Boot | Disabled |
+| Erase All Flash Before Sketch Upload | Disabled |
+| Events Run On | Core 1 |
+| Flash Mode | QIO 80MHz |
+| Flash Size | **16MB (128Mb)** |
+| JTAG Adapter | Disabled |
+| Arduino Runs On | Core 1 |
+| USB Firmware MSC On Boot | Disabled |
+| Partition Scheme | **Custom** |
+| PSRAM | **OPI PSRAM** |
+| Upload Mode | UART0 / Hardware CDC |
+| Upload Speed | 921600 |
+| USB Mode | Hardware CDC and JTAG |
+| Zigbee Mode | Disabled |
+
+For `arduino-cli`, the same settings as an FQBN:
+
+```
+esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,PartitionScheme=custom,PSRAM=opi
+```
 
 ### Libraries
 
@@ -137,6 +169,24 @@ The core's `cpp_flags` passes `-Wno-sign-compare` before `-Wall -Wextra` is appe
 specific `-Wno-` beats a later umbrella flag. Arduino expands `build_opt.h` after
 `cpp_flags`, which is why overriding it there works. Delete the file and that class silently
 disappears from the build.
+
+The IDE setting *Compiler warnings: None* (File → Preferences) passes `-w`, which hides every
+warning, including the ones `build_opt.h` asks for. Use *Default* or higher. The IDE's output
+panel also drops the start of a long log, so for a full warning check compile with the
+`arduino-cli` that ships with the IDE and keep the log in a file outside the repository
+(macOS paths):
+
+```bash
+CLI="/Applications/Arduino IDE.app/Contents/Resources/app/lib/backend/resources/arduino-cli"
+cd software
+"$CLI" compile --clean --warnings all \
+  --fqbn "esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,PartitionScheme=custom,PSRAM=opi" \
+  --build-property "compiler.cpp.extra_flags=-Wdouble-promotion" \
+  Hexapod 2>&1 | tee ~/hexapod-build.log
+```
+
+`--warnings all` adds `-Wall -Wextra`, `build_opt.h` adds `-Wsign-compare`, and the build
+property adds `-Wdouble-promotion`.
 
 ## How it runs
 
