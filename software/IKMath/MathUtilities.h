@@ -123,7 +123,7 @@ class Vector2
     float x, y;
 
   public:
-   Vector2()                   : x(0),  y(0)    {}
+    Vector2()                   : x(0),  y(0)    {}
     Vector2(float vx, float vy) : x(vx), y(vy)   {}
 
     // explicit: a bare float is not a vector, so it must not convert to one implicitly.
@@ -141,7 +141,7 @@ class Vector2
     [[nodiscard]] String toString() const;
     operator String() const;
 
-    // Add two vectors (v1 - v2)
+    // Add two vectors (v1 + v2)
     Vector2 operator+(const Vector2& v) const;
     Vector2& operator+=(const Vector2& v);
 
