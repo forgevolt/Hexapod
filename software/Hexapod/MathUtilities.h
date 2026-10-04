@@ -3,7 +3,6 @@
 #include <Arduino.h>
 #include <math.h>    // Required for: sinf(), cosf(), tan(), atan2f(), sqrtf(), floor(), fminf(), fmaxf(), fabsf()
 #include <cmath>     // std:: float overloads of the above
-#include <algorithm> // std::clamp
 
 // ----------------------------------------------------------------------------------------
 
@@ -44,10 +43,23 @@ inline bool floatEquals(float x, float y)
   return (fabsf(x - y)) <= (cEPSILON*fmaxf(1.0f, fmaxf(fabsf(x), fabsf(y))));
 }
 
+// Clamp a float value to [min, max].
+// Deliberately not std::clamp: arduino-esp32 2.0.17 compiles as -std=gnu++11 and
+// std::clamp is C++17. Named clampf (like lerpf) so it never collides with the
+// Vector2/Vector3 member clamp() inside their own member functions.
+inline float clampf(float value, float min, float max)
+{
+  float result = (value < min) ? min : value;
+
+  if (result > max) result = max;
+
+  return result;
+}
+
 // Calculate linear interpolation between two floats.
 inline float lerpf(float start, float end, float amount)
 {
-  amount = std::clamp(amount, 0.0f, 1.0f);   // matches the Vector lerp() overloads
+  amount = clampf(amount, 0.0f, 1.0f);   // matches the Vector lerp() overloads
   return start + amount * (end - start);
 }
 
@@ -74,7 +86,7 @@ inline float wrap(float value, float min, float max)
 inline float smoothstep(float value)
 {
   // Clamp t to the [0, 1] range to prevent undefined behavior
-  float t = std::clamp(value, 0.0f, 1.0f);
+  float t = clampf(value, 0.0f, 1.0f);
   
   // The cubic formula: 3t^2 - 2t^3
   return t * t * (3.0f - 2.0f * t);
@@ -88,7 +100,7 @@ inline float smoothstep(float value, float start, float end)
 inline float smootherstep(float value)
 {
   // Clamp t to the [0, 1] range to prevent undefined behavior
-  float t = std::clamp(value, 0.0f, 1.0f);
+  float t = clampf(value, 0.0f, 1.0f);
   
   // smootherstep f(x) = 6*x^5 - 15*x^4 + 10*x^3
   return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
@@ -123,12 +135,12 @@ class Vector2
     float x, y;
 
   public:
-    Vector2()                   : x(0),  y(0)    {}
-    Vector2(float vx, float vy) : x(vx), y(vy)   {}
+    constexpr Vector2()                   : x(0),  y(0)    {}
+    constexpr Vector2(float vx, float vy) : x(vx), y(vy)   {}
 
     // explicit: a bare float is not a vector, so it must not convert to one implicitly.
     // Spell out (vx, 0), or use Vector2() where a zero vector is meant.
-    explicit Vector2(float vx)  : x(vx), y(0)    {}
+    constexpr explicit Vector2(float vx)  : x(vx), y(0)    {}
 
     Vector2(const Vector2&)            = default;
     Vector2& operator=(const Vector2&) = default;
@@ -180,6 +192,12 @@ class Vector2
     // Calculate the vector's squared length
     [[nodiscard]] float lengthSqr() const;
 
+    // Calculate the distance between two vectors
+    [[nodiscard]] float distance(const Vector2& v) const;
+
+    // Rotate the vector by an angle in radians
+    [[nodiscard]] Vector2 rotate(float angleRad) const;
+
   protected:
     void set(const Vector2& v) 
     {
@@ -192,7 +210,7 @@ class Vector2
 inline Vector2 lerp(const Vector2& v1, const Vector2& v2, float u)
 {
   // Ensure u in [0, 1]
-  u = std::clamp(u, 0.0f, 1.0f);
+  u = clampf(u, 0.0f, 1.0f);
 
   return v1 + (v2 - v1) * u;
 }
@@ -200,7 +218,7 @@ inline Vector2 lerp(const Vector2& v1, const Vector2& v2, float u)
 // Quadratic Bézier for 2D Vectors
 inline Vector2 bezier2(const Vector2& p0, const Vector2& p1, const Vector2& p2, float u) 
 {
-  u = std::clamp(u, 0.0f, 1.0f);
+  u = clampf(u, 0.0f, 1.0f);
   float v = 1.0f - u;
 
   return (p0 * (v * v))        + 
@@ -214,8 +232,8 @@ inline Vector2 circularNormalization(float x, float y)
 {
   // Clamped defensively (rather than merely assumed) - an out-of-range input would
   // otherwise make (1 - y2/2) or (1 - x2/2) go negative, producing NaN from sqrtf().
-  x = std::clamp(x, -1.0f, 1.0f);
-  y = std::clamp(y, -1.0f, 1.0f);
+  x = clampf(x, -1.0f, 1.0f);
+  y = clampf(y, -1.0f, 1.0f);
 
   float x2 = x * x;
   float y2 = y * y;
@@ -238,13 +256,13 @@ class Vector3
     float x, y, z;
 
   public:
-    Vector3()                             : x(0),  y(0),  z(0)  {}
-    Vector3(float vx, float vy, float vz) : x(vx), y(vy), z(vz) {}
-    explicit Vector3(float vx, float vy)  : x(vx), y(vy), z(0)  {}
+    constexpr Vector3()                             : x(0),  y(0),  z(0)  {}
+    constexpr Vector3(float vx, float vy, float vz) : x(vx), y(vy), z(vz) {}
+    constexpr explicit Vector3(float vx, float vy)  : x(vx), y(vy), z(0)  {}
 
     // explicit: a bare float is not a vector, so it must not convert to one implicitly.
     // Spell out (vx, 0, 0), or use Vector3() where a zero vector is meant.
-    explicit Vector3(float vx)            : x(vx), y(0),  z(0)  {}
+    constexpr explicit Vector3(float vx)            : x(vx), y(0),  z(0)  {}
 
     Vector3(const Vector3&)            = default;
     Vector3& operator=(const Vector3&) = default;
@@ -395,7 +413,7 @@ inline Vector3 rotateXYZ(const Vector3& v, const Vector3& angleRad)
 inline Vector3 lerp(const Vector3& v1, const Vector3& v2, float u)
 {
   // Ensure u in [0, 1]
-  u = std::clamp(u, 0.0f, 1.0f);
+  u = clampf(u, 0.0f, 1.0f);
 
   return v1 + (v2 - v1) * u;
 }
@@ -404,7 +422,7 @@ inline Vector3 lerp(const Vector3& v1, const Vector3& v2, float u)
 inline Vector3 smoothstep(const Vector3& v1, const Vector3& v2, float u)
 {
   // Ensure u in [0, 1]
-  u = std::clamp(u, 0.0f, 1.0f);
+  u = clampf(u, 0.0f, 1.0f);
 
   // smoothstep f(x) = 3*x^2 - 2*x^3 
   float s = u * u * (3.0f - 2.0f * u); 
@@ -416,7 +434,7 @@ inline Vector3 smoothstep(const Vector3& v1, const Vector3& v2, float u)
 inline Vector3 minjerk(const Vector3& v1, const Vector3& v2, float u)
 {
   // Ensure u in [0, 1]
-  u = std::clamp(u, 0.0f, 1.0f);
+  u = clampf(u, 0.0f, 1.0f);
 
   // minjerk f(x) = 10x^3 - 15x^4 + 6x^5 
   float s = u*u*u*(10 - 15*u + 6*u*u);
@@ -432,7 +450,7 @@ inline Vector3 bezier3(
   const Vector3& p3, // End: Where the path finishes.
   float u)           // [0, 1]
 {
-  u = std::clamp(u, 0.0f, 1.0f);
+  u = clampf(u, 0.0f, 1.0f);
 
   // The formula: (1-u)^3*P0 + 3*(1-u)^2*u*P1 + 3*(1-u)*u^2*P2 + u^3*P3
 

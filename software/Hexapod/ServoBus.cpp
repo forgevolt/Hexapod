@@ -1,6 +1,7 @@
 #include "ServoBus.h"
 #include "MathUtilities.h"
 #include <Streaming.h>
+#include <algorithm>   // std::clamp
 
 using namespace ControlTableItem;
 

@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include <cmath>
+#include <algorithm>   // std::clamp, std::max
 #include "GaitEngine.h"
 #include "Gaits.h"
 #include "Hexapod.h"

@@ -2,6 +2,7 @@
 #include <Streaming.h>
 #include "Leg.h"
 #include "MathUtilities.h"
+#include <algorithm>   // std::clamp
 
 // ---- Leg -------------------------------------------------------------------------------
 

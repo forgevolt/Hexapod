@@ -144,8 +144,8 @@ Vector2 Vector2::clamp(float min, float max) const
 {
   Vector2 result;
 
-  result.x = std::clamp(x, min, max);
-  result.y = std::clamp(y, min, max);
+  result.x = clampf(x, min, max);
+  result.y = clampf(y, min, max);
 
   return result;
 }
@@ -176,6 +176,26 @@ float Vector2::length() const
 float Vector2::lengthSqr() const
 {
   return (x*x) + (y*y);
+}
+
+// ----------------------------------------------------------------------------------------
+float Vector2::distance(const Vector2& v) const
+{
+  return sqrtf((x - v.x)*(x - v.x) + (y - v.y)*(y - v.y));
+}
+
+// ----------------------------------------------------------------------------------------
+Vector2 Vector2::rotate(float angleRad) const
+{
+  Vector2 result;
+
+  float cosres = cosf(angleRad);
+  float sinres = sinf(angleRad);
+
+  result.x = x*cosres - y*sinres;
+  result.y = x*sinres + y*cosres;
+
+  return result;
 }
 
 
@@ -333,9 +353,9 @@ Vector3 Vector3::clamp(float min, float max) const
 {
   Vector3 result;
 
-  result.x = std::clamp(x, min, max);
-  result.y = std::clamp(y, min, max);
-  result.z = std::clamp(z, min, max);
+  result.x = clampf(x, min, max);
+  result.y = clampf(y, min, max);
+  result.z = clampf(z, min, max);
 
   return result;
 }
