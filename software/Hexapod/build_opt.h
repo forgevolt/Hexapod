@@ -1,1 +1,4 @@
+-Wall
+-Wextra
+-Wdouble-promotion
 -Wsign-compare

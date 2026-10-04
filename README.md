@@ -158,17 +158,25 @@ as a logged mismatch at pairing rather than as silently misread data.
 
 ### Compiler warnings
 
-`software/Hexapod/build_opt.h` re-enables one warning class that the esp32 core suppresses
-by default:
+`software/Hexapod/build_opt.h` switches on more warnings than the core does:
 
 ```
+-Wall
+-Wextra
+-Wdouble-promotion
 -Wsign-compare
 ```
 
-The core's `cpp_flags` passes `-Wno-sign-compare` before `-Wall -Wextra` is appended, and a
-specific `-Wno-` beats a later umbrella flag. Arduino expands `build_opt.h` after
-`cpp_flags`, which is why overriding it there works. Delete the file and that class silently
-disappears from the build.
+`-Wdouble-promotion` matters on the ESP32-S3, which has no hardware double: it catches float
+maths that silently turns into slow double maths. `-Wsign-compare` has to be listed by name:
+the core's `cpp_flags` passes `-Wno-sign-compare`, and a specific `-Wno-` beats a later
+umbrella flag such as `-Wall`. Arduino expands `build_opt.h` after `cpp_flags`, which is why
+overriding it there works. Delete the file and these warnings silently disappear from the
+build.
+
+The firmware builds without a warning from its own sources. The flags apply to the core and
+the libraries as well, so a clean build still lists several hundred warnings from those,
+most of them from FastLED.
 
 The IDE setting *Compiler warnings: None* (File → Preferences) passes `-w`, which hides every
 warning, including the ones `build_opt.h` asks for. Use *Default* or higher. The IDE's output
@@ -181,12 +189,11 @@ CLI="/Applications/Arduino IDE.app/Contents/Resources/app/lib/backend/resources/
 cd software
 "$CLI" compile --clean --warnings all \
   --fqbn "esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=16M,PartitionScheme=custom,PSRAM=opi" \
-  --build-property "compiler.cpp.extra_flags=-Wdouble-promotion" \
   Hexapod 2>&1 | tee ~/hexapod-build.log
 ```
 
-`--warnings all` adds `-Wall -Wextra`, `build_opt.h` adds `-Wsign-compare`, and the build
-property adds `-Wdouble-promotion`.
+`--warnings all` matters: without it `arduino-cli` uses `none`, which passes `-w` just like
+the IDE setting. The flags themselves come from `build_opt.h`.
 
 ## How it runs
 

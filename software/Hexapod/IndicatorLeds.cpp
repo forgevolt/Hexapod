@@ -18,15 +18,6 @@ constexpr CRGB     cSweepColor         = CRGB(220, 60, 0); // Warm orange-red co
 // ---- IndicatorLeds ---------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------------------
-IndicatorLeds::IndicatorLeds()
-  : myLastFrameTime(0),
-    myRequestedEffect(Effect::eNone),
-    myActiveEffect(Effect::eNone),
-    myPulsePhase(3.0f * M_PI / 2.0f),
-    mySweepPos(0.0f)
-{}
-
-// ----------------------------------------------------------------------------------------
 void IndicatorLeds::setEffect(Effect effect)
 {
   myRequestedEffect.store(effect);
@@ -41,7 +32,7 @@ void IndicatorLeds::update()
     myActiveEffect = requested;
 
     // Reset all per-effect state so every effect starts from the beginning of its cycle.
-    myPulsePhase = 3.0f * M_PI / 2.0f; // pulse starts at minimum brightness
+    myPulsePhase = cPulseStartPhase;
     mySweepPos   = 0.0f;
 
     // Clear the strip so there is no leftover frame from the previous effect.
@@ -71,8 +62,8 @@ void IndicatorLeds::runPulseRed()
 
   // Advance the phase and keep it in [0, 2π)
   myPulsePhase += cPulseSpeed;
-  if (myPulsePhase >= 2.0f * M_PI)
-    myPulsePhase -= 2.0f * M_PI;
+  if (myPulsePhase >= cTwoPI)
+    myPulsePhase -= cTwoPI;
 
   // Map sin() from [-1, 1] to [cPulseMinBrightness, 255]
   float   sineValue  = (sinf(myPulsePhase) + 1.0f) * 0.5f; // 0.0 – 1.0
@@ -91,8 +82,8 @@ void IndicatorLeds::runPulseOrange()
 
   // Advance the phase and keep it in [0, 2π)
   myPulsePhase += cPulseSpeed;
-  if (myPulsePhase >= 2.0f * M_PI)
-    myPulsePhase -= 2.0f * M_PI;
+  if (myPulsePhase >= cTwoPI)
+    myPulsePhase -= cTwoPI;
 
   // Map sin() from [-1, 1] to [cPulseMinBrightness, 255] and scale the sweep color.
   float   sineValue  = (sinf(myPulsePhase) + 1.0f) * 0.5f; // 0.0 – 1.0

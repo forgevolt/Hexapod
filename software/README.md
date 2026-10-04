@@ -22,7 +22,7 @@ because an 18-servo machine is painful to debug all at once.
 | `StatusDisplay.*` | the eyes and the fault display |
 | `IndicatorLeds.*` | the LED strip effects |
 | `PinMap.h` | every GPIO in the project |
-| `build_opt.h` | re-enables `-Wsign-compare`, which the core suppresses |
+| `build_opt.h` | extra compiler warnings: `-Wall -Wextra -Wdouble-promotion -Wsign-compare` |
 | `partitions.csv` | 6 MB app + 9.8 MB LittleFS; overrides the Tools menu |
 
 The state machine in `Hexapod.cpp` - every state, guard, gait and timeout - is drawn in

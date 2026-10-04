@@ -3,6 +3,8 @@
 #include <FastLED.h>
 #include <atomic>
 
+#include "MathUtilities.h"
+
 // ---- Constants -------------------------------------------------------------------------
 
 constexpr uint8_t  cNumLeds       = 19;
@@ -27,7 +29,7 @@ class IndicatorLeds
 
     enum class Effect { eNone, ePulseRed, ePulseOrange, eSweepForward, eSweepBackward, eSweepMeetInMiddle };
 
-    IndicatorLeds();
+    IndicatorLeds() = default;
 
     // Call once in setup() to register the LED strip with FastLED.
     template <int DATA_PIN> 
@@ -73,6 +75,9 @@ class IndicatorLeds
 
     // ---- State ----------------------------------------------------------------------
 
+    // Every pulse starts at minimum brightness (sin = -1).
+    static constexpr float cPulseStartPhase = 1.5f * cPI;
+
     CRGB myLeds[cNumLeds];
 
     uint32_t myLastFrameTime = 0; // millis() at the last rendered frame
@@ -84,7 +89,7 @@ class IndicatorLeds
     Effect myActiveEffect = Effect::eNone;
 
     // Pulse state
-    float myPulsePhase = 3.0f * M_PI / 2.0f; // starts at minimum brightness (sin = -1)
+    float myPulsePhase = cPulseStartPhase;
 
     // Sweep state (shared by all sweep effects)
     float mySweepPos = 0.0f; // distance traveled from the starting end (pixels)

@@ -352,21 +352,22 @@ void Hexapod::step(float dt_ms)
     if (myLastStepHeight != stepHeight)
     {
       myLastStepHeight = stepHeight;
-      snprintf(myStrStepHeight, sizeof(myStrStepHeight), "%.0f", stepHeight);
+      snprintf(myStrStepHeight, sizeof(myStrStepHeight), "%.0f", static_cast<double>(stepHeight));
       changed = true;
     }
 
     if (myLastStepLength != stepLength)
     {
       myLastStepLength = stepLength;
-      snprintf(myStrStepLength, sizeof(myStrStepLength), "%.0f", stepLength);
+      snprintf(myStrStepLength, sizeof(myStrStepLength), "%.0f", static_cast<double>(stepLength));
       changed = true;
     }
 
     if (myLastGroundClearance != groundClearance)
     {
       myLastGroundClearance = groundClearance;
-      snprintf(myStrGroundClearance, sizeof(myStrGroundClearance), "%.0f", groundClearance);
+      snprintf(myStrGroundClearance, sizeof(myStrGroundClearance), "%.0f",
+               static_cast<double>(groundClearance));
       changed = true;
     }
 

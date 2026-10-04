@@ -25,9 +25,12 @@ String Vector2::toString() const
   // not quietly cut in half.
   char buffer[40];
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdouble-promotion"   // printf varargs promote float to double; "%f" takes a double
   const int n = snprintf(buffer, sizeof(buffer), "%.2f, %.2f", x, y);
   if (n < 0 || n >= static_cast<int>(sizeof(buffer)))
     snprintf(buffer, sizeof(buffer), "%g, %g", x, y);
+#pragma GCC diagnostic pop
 
   return buffer;
 }
@@ -196,9 +199,12 @@ String Vector3::toString() const
   // See Vector2::toString() for why this is sized the way it is.
   char buffer[60];
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdouble-promotion"   // printf varargs promote float to double; "%f" takes a double
   const int n = snprintf(buffer, sizeof(buffer), "%.2f, %.2f, %.2f", x, y, z);
   if (n < 0 || n >= static_cast<int>(sizeof(buffer)))
     snprintf(buffer, sizeof(buffer), "%g, %g, %g", x, y, z);
+#pragma GCC diagnostic pop
 
   return buffer;
 }
