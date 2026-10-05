@@ -2,7 +2,8 @@
 
 #include "GaitEngine.h"
 #include "Gaits.h"
-#include "MathUtilities.h"
+#include <VectorUtilities.h>
+using namespace vectorutilities;
 #include "Leg.h"
 #include "Hexapod.h"
 #include "PinMap.h"

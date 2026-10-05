@@ -4,7 +4,8 @@
 #include "GaitEngine.h"
 #include "Gaits.h"
 #include "Hexapod.h"
-#include "MathUtilities.h"
+#include <VectorUtilities.h>
+using namespace vectorutilities;
 
 #include <Streaming.h>
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "MathUtilities.h"
+#include <VectorUtilities.h>
+using namespace vectorutilities;
 #include "ServoBus.h"
 #include <cstddef>   // std::size_t
 #include <atomic>

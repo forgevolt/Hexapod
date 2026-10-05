@@ -3,7 +3,8 @@
 #include <Dynamixel2Arduino.h>
 #include <atomic>
 #include <Streaming.h>
-#include "MathUtilities.h"
+#include <VectorUtilities.h>
+using namespace vectorutilities;
 
 // ---- Helper ----------------------------------------------------------------------------
 

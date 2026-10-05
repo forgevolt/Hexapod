@@ -23,5 +23,5 @@ tibia angles.
 dimensions in `mechanics/`, which is what makes the constants in the code readable rather
 than magic.
 
-`software/IKMath/` is the runnable companion - the same `Leg` and `MathUtilities`, with no
+`software/IKMath/` is the runnable companion - the same `Leg` code, with no
 robot attached.

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "MathUtilities.h"
+#include <VectorUtilities.h>
+using namespace vectorutilities;
 #include "Receiver.h"
 
 // ---- GaitEngine ------------------------------------------------------------------------

@@ -1,7 +1,8 @@
 #include "GaitEngine.h"
 #include "Gaits.h"
 #include "Hexapod.h"
-#include "MathUtilities.h"
+#include <VectorUtilities.h>
+using namespace vectorutilities;
 
 #include <Streaming.h>
 #include <algorithm>
@@ -52,7 +53,7 @@ void ParkGait::update(float phase, const GaitEngine::MotionCmd&)
 
   for (std::size_t i = 0; i < cNumLegs; i++)
   {
-    // The path is a cubic Bézier. lerp(), smoothstep() and minjerk() in MathUtilities.h are
+    // The path is a cubic Bézier. lerp(), smoothstep() and minjerk() in VectorUtilities are
     // simpler alternatives over the same start/target pair.
 
     // Define the trajectory

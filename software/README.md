@@ -15,7 +15,7 @@ because an 18-servo machine is painful to debug all at once.
 | Files | Responsibility |
 | --- | --- |
 | `Hexapod.ino`, `Hexapod.*` | state machine, task setup, telemetry, and the top-level `step()` |
-| `Leg.*`, `MathUtilities.*` | per-leg inverse and forward kinematics, vector maths |
+| `Leg.*` | per-leg inverse and forward kinematics (the vector maths come from VectorUtilities) |
 | `GaitEngine.*`, `Gaits.*` | gait scheduling, and the park, stand, pose, level and walking gaits |
 | `ServoBus.*` | the Dynamixel bus: sync read/write, joint limits, torque |
 | `Receiver.*`, `RCProtocol.h` | the ESP-NOW link, control data in and telemetry out |
@@ -53,9 +53,9 @@ whatever they find, so a whole bus will end up with the same ID.
 
 ## `IKMath/` - kinematics without the robot
 
-`IKMath.ino` runs the same `Leg` and `MathUtilities` as the firmware, decoupled from the
+`IKMath.ino` runs the same `Leg` as the firmware, decoupled from the
 state machine, the radio and the gaits. It made the maths debuggable in isolation, and it is
-the sketch to reach for when changing the kinematics. `Leg.cpp` and `MathUtilities.cpp` here
+the sketch to reach for when changing the kinematics. `Leg.*` and `ServoBus.*` here
 are copies of the firmware's, for the same Arduino include reason as `RCProtocol.h` - keep
 them in step.
 

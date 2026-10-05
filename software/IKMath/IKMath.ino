@@ -7,7 +7,8 @@
 
 #include <Streaming.h>
 #include "ServoBus.h"
-#include "MathUtilities.h"
+#include <VectorUtilities.h>
+using namespace vectorutilities;
 #include "Leg.h"
 
 constexpr int cDXLDirPin = 16; 

@@ -1,7 +1,8 @@
 #include "ServoBus.h"
 #include <Streaming.h>
 #include "Leg.h"
-#include "MathUtilities.h"
+#include <VectorUtilities.h>
+using namespace vectorutilities;
 #include <algorithm>   // std::clamp
 
 // ---- Leg -------------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 #include "ServoBus.h"
-#include "MathUtilities.h"
+#include <VectorUtilities.h>
+using namespace vectorutilities;
 #include <Streaming.h>
 #include <algorithm>   // std::clamp
 

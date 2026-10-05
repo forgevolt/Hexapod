@@ -3,7 +3,8 @@
 #include <FastLED.h>
 #include <atomic>
 
-#include "MathUtilities.h"
+#include <VectorUtilities.h>
+using namespace vectorutilities;
 
 // ---- Constants -------------------------------------------------------------------------
 

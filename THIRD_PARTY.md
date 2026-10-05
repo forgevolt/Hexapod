@@ -13,11 +13,15 @@ keeps its own licence.
 | Streaming         | LGPL-2.1-or-later    | the `Serial <<` logging           |
 | SoundEngine       | MIT                  | I2S mixing and playback           |
 | ESPNowUtilities   | MIT                  | the ESP-NOW link to the transmitter |
+| VectorUtilities   | MIT (raymath: zlib)  | vectors, rotations, motion curves |
 
-The last two are written for this project and published separately, under the same MIT
+The last three are written for this project and published separately, under the same MIT
 licence as this repository:
-[SoundEngine](https://github.com/forgevolt/SoundEngine) and
-[ESPNowUtilities](https://github.com/forgevolt/ESPNowUtilities).
+[SoundEngine](https://github.com/forgevolt/SoundEngine),
+[ESPNowUtilities](https://github.com/forgevolt/ESPNowUtilities) and
+[VectorUtilities](https://github.com/forgevolt/VectorUtilities). VectorUtilities' vector code is
+derived from raymath, part of [raylib](https://github.com/raysan5/raylib) (zlib licence); the
+library carries raylib's licence notice.
 
 ## Streaming
 
