@@ -200,9 +200,10 @@ bool Hexapod::begin(bool announceFault)
 
   changeState(HexapodState::eOff);
 
-  // A failed servo bus is not harmless: the state machine still reaches eReady and can be
-  // commanded to stand. changeState() above hid the display, so the fault has to switch it
-  // back on, which showError() does itself.
+  // A failed servo bus does not stop the state machine (see Hexapod.ino): it still reaches
+  // eReady, but ServoBus moves nothing, so the robot only looks alive. The fault face and the
+  // error tone below are what tell the operator. changeState() above hid the display, so the
+  // fault has to switch it back on, which showError() does itself.
   if (result == false)
     myStatusDisplay.showError("SERVO INIT FAILED", "check servo bus");
 

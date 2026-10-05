@@ -88,8 +88,9 @@ void setup()
 
   if (hexapodIsUp == false)
   {
-    // Continuing is deliberate, and unlike the receiver it is not harmless: the state machine will
-    // still reach eReady and can be commanded to stand on a servo bus that failed to initialize.
+    // Continuing is deliberate: it lets a test board without servos run the state machine, the
+    // display and the LEDs. It is also safe - ServoBus refuses every move, torque and read until
+    // all servos are configured, so the legs stay limp whatever state the robot reaches.
     Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> hexapod.begin() failed" << endl; 
   }
   else if (abnormalReset == true)
