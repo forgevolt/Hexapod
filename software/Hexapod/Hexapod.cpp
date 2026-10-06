@@ -890,11 +890,12 @@ void Hexapod::schedulerTask(void* pvParameters)
   // step() is too slow and the loop is no longer running at cTargetUpdateRate.
   int overrunCounter = 0;
 
-  // Register with the task watchdog. Arduino-ESP32's default TWDT already watches the idle
-  // tasks, which catches this task *spinning* at priority 8; registering explicitly also catches
-  // it *blocking* - stuck on a bus read or a mutex - where the idle task still runs and the idle
-  // check stays quiet. Either way a hung control loop reboots rather than leaving the robot
-  // torqued up with nothing driving it.
+  // Register with the task watchdog and feed it at the top of every pass. A pass that never gets
+  // back to the top - blocked on a bus read or a mutex, or stuck in a loop inside step() - stops
+  // the feeding, and when the TWDT times out the robot reboots rather than staying torqued up
+  // with nothing driving it. Arduino-ESP32's TWDT watches only core 0's idle task, not core 1's,
+  // so this registration is the only guard this task has. The task cannot starve core 1 itself,
+  // since every pass gives up at least one tick (see the end of the loop).
   if (esp_task_wdt_add(nullptr) != ESP_OK)
     Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> esp_task_wdt_add failed - control loop is unguarded" << endl;
 
