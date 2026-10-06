@@ -332,6 +332,8 @@ void Receiver::onPairingResponseMsg(const PairingResponseData& pd, const uint8_t
     return;
   }
 
+  myTransmitterType = static_cast<EDeviceType>(pd.device);
+
   xSemaphoreTake(myMutex, portMAX_DELAY);
   myStatus = EPairingStatus::ePaired;
   xSemaphoreGive(myMutex);

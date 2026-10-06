@@ -65,6 +65,19 @@ class Receiver : public ESPNowConnection
     // arithmetic, so correct across millis() rollover.
     unsigned long timeSinceLastControlData() const { return millis() - myLastControlDataMs.load(); }
 
+    // The device type (EDeviceType) the transmitter announced when it last paired; eUndefined
+    // before the first pairing. It cannot change while paired, so it is kept here rather than
+    // read from the peer record, which would take the base class's peer lock. Lock-free.
+    EDeviceType transmitterType() const { return myTransmitterType.load(); }
+
+    // The axis that turns the robot: the left stick's twist (LZ) on a 1-joystick transmitter,
+    // the right stick's X (RX) on a 2-joystick one. Everything that reacts to turning should
+    // ask here rather than read RX directly.
+    int turnAxis(const ControlData& data) const
+    {
+      return (transmitterType() == eTransmitter1Joy) ? data.LZ : data.RX;
+    }
+
   protected:
     void onPairingResponseMsg(const PairingResponseData& pd, const uint8_t src[6]) override;
     void onAppMsg(uint8_t msgType, const void* data, size_t len, const PeerInfo& peer) override;
@@ -103,6 +116,9 @@ class Receiver : public ESPNowConnection
     // myMutex-protected so the 200 Hz control loop can test freshness without taking a lock
     // the WiFi task also holds.
     std::atomic<unsigned long> myLastControlDataMs = 0;
+
+    // Set in onPairingResponseMsg() once the peer is accepted; see transmitterType().
+    std::atomic<EDeviceType> myTransmitterType{eUndefined};
 
     TaskHandle_t      myLinkTaskHandle = nullptr;
     std::atomic<bool> myIsLinkTaskRunning{false};

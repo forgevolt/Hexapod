@@ -601,6 +601,9 @@ void Hexapod::stepPosing()
 // ----------------------------------------------------------------------------------------
 void Hexapod::stepWalking()
 {
+  // RX or LZ, depending on the transmitter - see Receiver::turnAxis().
+  const int turnInput = myReceiver.turnAxis(myControlData);
+
   // ----- LED effects
 
   // Walking forward?
@@ -616,7 +619,7 @@ void Hexapod::stepWalking()
     myLeds.setEffect(IndicatorLeds::Effect::eSweepForward);
   }
   // Walking sideways or turning?
-  else if (myControlData.LX != 0 || (myControlData.RX != 0 && myControlData.switch2 == false))
+  else if (myControlData.LX != 0 || (turnInput != 0 && myControlData.switch2 == false))
   {
     myLeds.setEffect(IndicatorLeds::Effect::eSweepMeetInMiddle);
   }
@@ -630,11 +633,11 @@ void Hexapod::stepWalking()
 
   // Map joystick input to eye position
   // Note: if switch2 == true then "adjust gait" is active
-  if (abs(myControlData.LX) >= abs(myControlData.RX) || myControlData.switch2 == true)
+  if (abs(myControlData.LX) >= abs(turnInput) || myControlData.switch2 == true)
     myStatusDisplay.setLookDirection(mapf(myControlData.LX * -1, cJoystickMin, cJoystickMax, -1.0f, 1.0f),
                                 mapf(myControlData.LY,      cJoystickMin, cJoystickMax, -1.0f, 1.0f));
   else
-    myStatusDisplay.setLookDirection(mapf(myControlData.RX * -1, cJoystickMin, cJoystickMax, -1.0f, 1.0f),
+    myStatusDisplay.setLookDirection(mapf(turnInput * -1, cJoystickMin, cJoystickMax, -1.0f, 1.0f),
                                 mapf(myControlData.LY,      cJoystickMin, cJoystickMax, -1.0f, 1.0f));
 
   // ----- Process inputs

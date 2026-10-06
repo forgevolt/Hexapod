@@ -118,11 +118,10 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
   // invariant break is still loud without spamming the log at 200 Hz forever.
   if (myActiveGait == nullptr) 
   {
-    static bool warned = false;
-    if (warned == false)
+    if (myWarnedNoGait == false)
     {
       Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> no active gait" << endl;
-      warned = true;
+      myWarnedNoGait = true;
     }
     return;
   }
@@ -229,14 +228,9 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
 
     // When SWITCH 2 is false: RX (-> 2-joy transmitter) or LZ (1-joy transmitter) rotates the
     // hexapod around its vertical axis (yaw)
-    static ESPNowConnection::PeerInfo peerInfo;
-    float inputRotation = 0.0f;
-    if (myHexapod.receiver().getPeerInfo(peerInfo) == true && peerInfo.device == eTransmitter1Joy)
-      inputRotation = input.LZ;
-    else
-      inputRotation = input.RX;
+    const int turnInput = myHexapod.receiver().turnAxis(input);
 
-    myAngularZ = (input.switch2 == false) ? lowPassFilter(myAngularZ, inputRotation, 25.0f, dt_ms) : 0.0f;
+    myAngularZ = (input.switch2 == false) ? lowPassFilter(myAngularZ, turnInput, 25.0f, dt_ms) : 0.0f;
     float magRotation = fabs(myAngularZ) / cJoystickMax;
     
     // Compute magnitude with magDirection as the 'Master'
@@ -258,7 +252,7 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
     // center, while the filters only approach it asymptotically. Only the raw value can tell
     // that the stick has been released.
     const bool isCommanded = (input.LX != 0 || input.LY != 0 ||
-                              (input.switch2 == false && input.RX != 0));
+                              (input.switch2 == false && turnInput != 0));
 
     if (isCommanded == true)
     {

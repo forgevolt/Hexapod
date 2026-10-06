@@ -153,5 +153,7 @@ class GaitEngine
     // active and SWITCH 2 is not held. Never written back to myParams.
     float myClearanceTrim = 0.0f;
 
+    // step() has reported a missing active gait. Logged once, not at 200 Hz.
+    bool myWarnedNoGait = false;
 };
 
