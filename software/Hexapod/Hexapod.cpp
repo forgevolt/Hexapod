@@ -219,7 +219,10 @@ bool Hexapod::begin(bool announceFault)
 
   // Not folded into 'result', for the same reason as the sound engine below: only servo
   // initialization decides whether begin() succeeds.
-  if (myStatusDisplay.begin(30) == false) // 30 fps, i.e. a 33 ms frame interval
+  // Asks for 30 fps (a 33 ms frame interval) but draws at 25: peripheralsTask polls every 20 ms,
+  // so the interval falls due on every second pass, 40 ms apart. Asking for exactly 25 fps would
+  // be worse - a pass late by a millisecond would then skip a whole frame.
+  if (myStatusDisplay.begin(30) == false)
     Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> status display init failed" << endl;
 
   myStatusDisplay.setAutoBlinker(true, 3, 2); // blink every 3 s ± up to 2 s variation

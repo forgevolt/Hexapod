@@ -2,6 +2,7 @@
 
 #include <Dynamixel2Arduino.h>
 #include <atomic>
+#include <cmath>     // lroundf
 #include <Streaming.h>
 #include <VectorUtilities.h>
 using namespace vectorutilities;
@@ -18,7 +19,9 @@ inline int32_t radToTick(float rad)
   // Ensure that rad is in [−π, π]
   rad = wrapPi(rad);
 
-  int32_t tick = static_cast<int32_t>(2048.0f + rad/cTwoPI*4096.0f);
+  // Rounded, not truncated: truncation would put every goal up to a tick short of the angle
+  // asked for, half a tick on average.
+  int32_t tick = static_cast<int32_t>(lroundf(2048.0f + rad/cTwoPI*4096.0f));
 
   // 12-bit resolution: valid range is [0, 4095]. wrapPi()'s inclusive upper bound
   // (+π) maps to 4096, one past the top of that range, so this still needs a clamp
