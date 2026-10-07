@@ -58,8 +58,9 @@ class StatusDisplay
     // immediately. Call once per iteration of the task that owns the I2C bus.
     void update();
 
-    // Show or hide all output. While hidden the screen is cleared and update() renders
-    // nothing; animation state (mood, position, timers, pending error) is preserved.
+    // Show or hide all output. Only sets a flag: the next frame of update() clears the screen,
+    // and while hidden update() renders nothing. Animation state (mood, position, timers,
+    // pending error) is preserved.
     void setVisible(bool visible);
 
 
@@ -197,8 +198,9 @@ class StatusDisplay
     unsigned long myLastFrameTime = 0;
 
     // ---- Visibility and mood ---------------------------------------------------------
-    bool myVisible = true;
-    Mood myMood    = Mood::eDefault;
+    bool myVisible     = true;
+    bool myScreenBlank = true; // the screen currently shows nothing; set and read by update()
+    Mood myMood        = Mood::eDefault;
 
     // ---- Eye geometry: target values, and the tweened values actually drawn ----------
     int myWidthTargetL  = 36, myWidthTargetR  = 36;

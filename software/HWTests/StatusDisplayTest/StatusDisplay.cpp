@@ -58,6 +58,7 @@ bool StatusDisplay::begin(uint8_t fps)
 
   myDisplay.clearBuffer();
   myDisplay.sendBuffer();
+  myScreenBlank = true;
 
   const unsigned long now = millis();
   myLastFrameTime = now;
@@ -77,8 +78,18 @@ void StatusDisplay::update()
       static_cast<long>(millis() - myErrorRaisedAt) >= static_cast<long>(cErrorTimeoutMs))
     clearError();
 
+  // Hiding is applied here rather than in setVisible(), so the I2C transfer that blanks the
+  // screen happens on the task that owns the bus, and only once per hide.
   if (myVisible == false)
+  {
+    if (myScreenBlank == false)
+    {
+      myDisplay.clearBuffer();
+      myDisplay.sendBuffer();
+      myScreenBlank = true;
+    }
     return;
+  }
 
   myDisplay.clearBuffer();
 
@@ -88,6 +99,7 @@ void StatusDisplay::update()
     drawEyes();
 
   myDisplay.sendBuffer();
+  myScreenBlank = false;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -101,13 +113,9 @@ void StatusDisplay::setVisible(bool visible)
     return;
   }
 
+  // Only the flag: update() blanks the screen on its next frame. This may be called from a
+  // task that does not own the I2C bus, so it must not touch the display itself.
   myVisible = visible;
-
-  if (myVisible == false)
-  {
-    myDisplay.clearBuffer();
-    myDisplay.sendBuffer();
-  }
 }
 
 
