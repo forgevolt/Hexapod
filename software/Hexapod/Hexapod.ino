@@ -109,7 +109,8 @@ void loop()
   const unsigned long currentMillis = millis();
 
   // Report what the control task counted, at most once per second and never from the control
-  // task itself. Silence means nothing was clamped and every bus write succeeded.
+  // task itself. Silence means nothing was clamped, every bus write succeeded and the control
+  // loop kept its rate.
   static unsigned long lastDiagReport = 0;
   if (currentMillis - lastDiagReport >= 1000)
   {
@@ -129,6 +130,10 @@ void loop()
 
     if (diag.syncWriteFails != 0)
       Serial << "Servo: " << diag.syncWriteFails << " syncWrite failure(s)" << endl;
+
+    if (diag.overruns != 0)
+      Serial << "Control loop: " << diag.overruns << " overrun(s), slowest step() "
+             << diag.worstStepUs << " us" << endl;
   }
 
   // Yield execution to lower-priority tasks / system IDLE task

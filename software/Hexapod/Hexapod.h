@@ -65,6 +65,10 @@ class Hexapod
       int32_t  worstGoalOvershoot = 0;  // ticks; meaningless when clampedGoals == 0
       int      worstGoalServo     = -1;
       uint32_t syncWriteFails     = 0;
+
+      // ---- Control loop
+      uint32_t overruns           = 0;  // passes that missed the cTargetUpdateRate deadline
+      uint32_t worstStepUs        = 0;  // slowest step() since the last fetch, in microseconds
     };
 
     // Call from loop(), not from the control task.
@@ -175,6 +179,11 @@ class Hexapod
     static void schedulerTask(void* pvParameters);
     std::atomic<bool> myIsTaskRunning;
     TaskHandle_t      myTaskHandle = nullptr;
+
+    // Control-loop timing for fetchDiagnostics(). Atomic: written by schedulerTask, exchanged
+    // to 0 from loop().
+    std::atomic<uint32_t> myOverruns{0};
+    std::atomic<uint32_t> myWorstStepUs{0};
 
     // Display + IMU: lower-priority task, same core, so slow I2C transfers can never
     // delay a servo update - see peripheralsTask()'s comment in Hexapod.cpp.

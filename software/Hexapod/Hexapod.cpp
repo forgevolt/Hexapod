@@ -195,6 +195,9 @@ Hexapod::Diagnostics Hexapod::fetchDiagnostics()
   result.worstGoalServo     = servo.worstGoalServo;
   result.syncWriteFails     = servo.syncWriteFails;
 
+  result.overruns    = myOverruns.exchange(0);
+  result.worstStepUs = myWorstStepUs.exchange(0);
+
   return result;
 }
 
@@ -960,17 +963,10 @@ void Hexapod::schedulerTask(void* pvParameters)
   // Offset by one nominal period so the very first tick sees dt_ms rather than 0.
   int64_t lastCycleStart = esp_timer_get_time() - static_cast<int64_t>(dt_ms) * 1000;
 
-  // To compute the time of one update and the delay if we are too fast
-  int64_t t0, t1;
-  int delayMS;
-
-  // To compute the actual number of servo updates per second to verify if we are fast enough
-  int updateCounter = 0; 
-  int64_t startTime = 0;
-
-  // Ticks in the current second that missed the dt_ms deadline. A non-zero value means
-  // step() is too slow and the loop is no longer running at cTargetUpdateRate.
-  int overrunCounter = 0;
+  // Fixed-rate wake-up: xTaskDelayUntil() wakes dt_ms after the previous wake-up however long
+  // step() took, so the period is a steady dt_ms instead of varying with where in the tick the
+  // delay began. It returns pdFALSE when that deadline had already passed - an overrun.
+  TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Register with the task watchdog and feed it at the top of every pass. A pass that never gets
   // back to the top - blocked on a bus read or a mutex, or stuck in a loop inside step() - stops
@@ -988,17 +984,7 @@ void Hexapod::schedulerTask(void* pvParameters)
 
     if (h->myIsTaskRunning == true)
     {
-      t0 = esp_timer_get_time();
-
-      // Print update rate each second, DEBUG only
-      if (t0 - startTime > 1000000) 
-      {
-        // Serial << "#updates/sec:" << updateCounter << ", #overruns:" << overrunCounter << endl;
-        startTime = t0;
-        updateCounter = 0;
-        overrunCounter = 0;
-      }
-      ++updateCounter;
+      const int64_t t0 = esp_timer_get_time();
 
       float dt = static_cast<float>(t0 - lastCycleStart) / 1000.0f;
       if (dt > cMaxDtMS)
@@ -1008,20 +994,21 @@ void Hexapod::schedulerTask(void* pvParameters)
 
       h->step(dt);
 
-      // Measure whether we reach the target update rate. If input processing,
-      // computation, and servo control are faster than the maximum update rate,
-      // add a delay.  
-      t1 = esp_timer_get_time();  // us
-      delayMS = (dt_ms - (t1 - t0) / 1000);
-      if (delayMS > 0)
+      // Reported by fetchDiagnostics(). A plain load-compare-store rather than a
+      // compare-exchange loop: losing a race with loop()'s exchange(0) only understates one
+      // diagnostic figure.
+      const uint32_t stepUs = static_cast<uint32_t>(esp_timer_get_time() - t0);
+      if (stepUs > h->myWorstStepUs.load())
+        h->myWorstStepUs.store(stepUs);
+
+      if (xTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(dt_ms)) == pdFALSE)
       {
-        vTaskDelay(pdMS_TO_TICKS(delayMS));
-      }
-      else
-      {
-        // Behind schedule. Give up at least one full tick.
-        ++overrunCounter;
+        // Behind schedule, and xTaskDelayUntil() returned without blocking. Give up at least
+        // one full tick so lower-priority tasks on core 1 still run, and restart the schedule
+        // from now rather than catching up with back-to-back passes.
+        ++h->myOverruns;
         vTaskDelay(1);
+        lastWakeTime = xTaskGetTickCount();
       }
     }
     else
@@ -1031,8 +1018,10 @@ void Hexapod::schedulerTask(void* pvParameters)
       // core 1.
       vTaskDelay(pdMS_TO_TICKS(10));
 
-      // Do not let the stopped interval count as elapsed control time when the task resumes.
+      // Do not let the stopped interval count as elapsed control time when the task resumes,
+      // nor leave a schedule behind that it would try to catch up on.
       lastCycleStart = esp_timer_get_time() - static_cast<int64_t>(dt_ms) * 1000;
+      lastWakeTime   = xTaskGetTickCount();
     }
   }
 }
