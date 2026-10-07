@@ -92,9 +92,10 @@ in preference to the Tools menu: a 6 MB application partition plus a 9.8 MB Litt
 partition. Nothing in the firmware writes to that filesystem today, but the space is
 reserved.
 
-Before the robot will walk, the servos need IDs and a baud rate set, and each leg needs its
-joint limits read off - [`software/DynamixelUtilities/`](software/DynamixelUtilities) exists
-for exactly that, and the order to run them in is in that folder's README.
+Before the robot will walk, the servos need IDs and a baud rate set, and the joint limits
+need to be read off - [`software/DynamixelUtilities/`](software/DynamixelUtilities) exists
+for exactly that, and the order to run them in is in that folder's README. One set of limits
+covers all six legs (`Hexapod.cpp`), so take values that hold for every leg.
 
 ## Building
 

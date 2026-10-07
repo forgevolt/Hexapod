@@ -24,9 +24,11 @@ using namespace vectorutilities;
 namespace
 {
 
-const int32_t cMinCoxa  = 1200, cMaxCoxa  = 3000; 
-const int32_t cMinFemur = 900,  cMaxFemur = 3500; 
-const int32_t cMinTibia = 200,  cMaxTibia = 2700; 
+// Joint limits in servo ticks, one set shared by all six legs. Measured with PresentPosition
+// across every leg and chosen so that they hold for all of them; per-leg limits were not needed.
+const int32_t cMinCoxa  = 1200, cMaxCoxa  = 3000;
+const int32_t cMinFemur = 900,  cMaxFemur = 3500;
+const int32_t cMinTibia = 200,  cMaxTibia = 2700;
 
 // We target 'cTargetUpdateRate' servo position updates per second
 constexpr unsigned long cTargetUpdateRate = 200;
