@@ -176,8 +176,11 @@ struct GaitConfig
   float speedLimit;
 };
 
+// The gait tables are inline constexpr: every file that includes this header shares one copy,
+// instead of getting its own as a plain const would.
+
 // maximum speed on flat terrain (Fast & efficient)
-const GaitConfig cTripodGaitConfig = { 
+inline constexpr GaitConfig cTripodGaitConfig = { 
     0.5f, 
     {
         0.0f,  // LF
@@ -191,7 +194,7 @@ const GaitConfig cTripodGaitConfig = {
 };
 
 // moderate speed, good stability (Balanced speed vs stability)
-const GaitConfig cTetrapodGaitConfig = {
+inline constexpr GaitConfig cTetrapodGaitConfig = {
     1.0f / 3.0f,
     {
         0.0f/3.0f,  // LF
@@ -205,7 +208,7 @@ const GaitConfig cTetrapodGaitConfig = {
 };
 
 // uneven terrain, moderate speed, carrying payloads (Stable & smooth)
-const GaitConfig cRippleGaitConfig = { 
+inline constexpr GaitConfig cRippleGaitConfig = { 
     // 1.0f / 6.0f,
     0.32f,
     // 0.25f,
@@ -221,7 +224,7 @@ const GaitConfig cRippleGaitConfig = {
 };
 
 // maximum stability > speed (Ultra-stable, slow)
-const GaitConfig cWaveGaitConfig = {
+inline constexpr GaitConfig cWaveGaitConfig = {
     1.0f / 6.0f,
     {
         0.0f/6.0f,  // LF
@@ -235,7 +238,7 @@ const GaitConfig cWaveGaitConfig = {
 };
 
 // precise foot placement, climbing, sensors active (Very controlled, precise)
-const GaitConfig cCrawlGaitConfig = {
+inline constexpr GaitConfig cCrawlGaitConfig = {
     0.2f,
     {
         0.0f/6.0f,  // LF
