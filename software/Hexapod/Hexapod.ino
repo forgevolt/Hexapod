@@ -8,6 +8,8 @@
 
 #include <Streaming.h>
 #include <esp_system.h>   // esp_reset_reason()
+#include <esp_core_dump.h> // esp_core_dump_get_summary()
+#include <iterator>        // std::size
 #include "PinMap.h"
 #include "Receiver.h"
 #include "Hexapod.h"
@@ -32,6 +34,34 @@ static const char* resetReasonName(esp_reset_reason_t reason)
     case ESP_RST_SDIO:      return "SDIO";
     default:                return "unknown";
   }
+}
+
+// ---------------------------------------------------------------------------------------------
+// A panic (including a task watchdog timeout) saves a core dump to the coredump partition. This
+// prints its summary: the task that crashed, its program counter and backtrace. Decode the
+// addresses against the .elf of the same build, e.g. with the ESP Exception Decoder or
+//   xtensa-esp32s3-elf-addr2line -pfiaC -e Hexapod.ino.elf <address> ...
+// The dump stays in flash until the next panic overwrites it, so it is erased once it has been
+// printed to an open serial monitor; otherwise it would be reported again at every boot.
+static void reportCoreDump()
+{
+  if (esp_core_dump_image_check() != ESP_OK)
+    return; // no dump stored, or a corrupted one
+
+  esp_core_dump_summary_t summary;
+  if (esp_core_dump_get_summary(&summary) != ESP_OK)
+    return;
+
+  Serial << "Core dump from an earlier crash: task " << summary.exc_task
+         << ", PC 0x" << _HEX(summary.exc_pc) << endl;
+
+  Serial << "  Backtrace:";
+  for (uint32_t i = 0; i < summary.exc_bt_info.depth && i < std::size(summary.exc_bt_info.bt); i++)
+    Serial << " 0x" << _HEX(summary.exc_bt_info.bt[i]);
+  Serial << (summary.exc_bt_info.corrupted ? " (corrupted)" : "") << endl;
+
+  if (Serial)
+    esp_core_dump_image_erase();
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -69,6 +99,10 @@ void setup()
 
   Serial << "Reset reason: " << resetReasonName(resetReason)
          << (abnormalReset ? "   *** previous run ended abnormally ***" : "") << endl;
+
+  // Not only after an abnormal reset: a crash on battery is usually followed by a power-on
+  // once the robot is back on the bench.
+  reportCoreDump();
 
   // Verbose IDF logging only when a host is attached to receive it. Untethered there is
   // nobody reading, but the messages would still be formatted and pushed into the same
