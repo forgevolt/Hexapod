@@ -156,7 +156,9 @@ class LevelGait : public Gait
                                                // reading is momentarily jumpy
 
     // Tuning constants - adjust to taste
-    static constexpr float cFilterAlpha    = 0.1f;  // 0..1, higher = snappier but noisier
+    // 0..1, higher = snappier but noisier. Applied once per control tick, so it depends on
+    // cTargetUpdateRate: at 200 Hz, 0.1 is a time constant of about 47 ms.
+    static constexpr float cFilterAlpha    = 0.1f;
     static constexpr float cMaxCorrection  = 0.35f; // radians (~20 deg), safety clamp on correction
 };
 
