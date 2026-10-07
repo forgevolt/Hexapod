@@ -17,9 +17,10 @@ constexpr int cDXL_TX    = 17;
 
 ServoBus servoBus(cDXLDirPin, cDXL_RX, cDXL_TX);
 
-const int32_t cMinCoxa  = 1000, cMaxCoxa  = 3100;
-const int32_t cMinFemur = 800,  cMaxFemur = 3700;
-const int32_t cMinTibia = 700,  cMaxTibia = 3000; 
+// Joint limits as in software/Hexapod/Hexapod.cpp.
+const int32_t cMinCoxa  = 1200, cMaxCoxa  = 3000;
+const int32_t cMinFemur = 900,  cMaxFemur = 3500;
+const int32_t cMinTibia = 200,  cMaxTibia = 2700;
 
 Leg leftFront(LegId::LF,  servoBus, 0, 1, 2);
 Leg leftMiddle(LegId::LM, servoBus, 3, 4, 5);
@@ -68,8 +69,15 @@ void setup()
   servoBus.configureServo(17, 33, cMinTibia, cMaxTibia);
 
   servoBus.begin();
+
+  // Hold where the servos are before enabling torque, as ServoBus.h requires: otherwise each
+  // servo would drive to whatever stale goal its own register still holds.
+  servoBus.syncReadPresentPosition();
+  for (int i = 0; i < ServoBus::cNumServos; i++)
+    servoBus.setGoalPosition(i, servoBus.presentPosition(i));
+  servoBus.syncWrite();
+
   servoBus.setSafeTorque();
-  servoBus.syncReadPresentPosition();  
 }
 
 // ---------------------------------------------------------------------------------------------

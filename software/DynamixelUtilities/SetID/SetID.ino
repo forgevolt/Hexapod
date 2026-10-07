@@ -13,8 +13,8 @@ using namespace std;
 
 // #define DXL_SERIAL   Serial2 // In Core 3.x, the default pins are 26 and 27. In Core 2.x, the defaults were 16 and 17.
 #define DXL_SERIAL   Serial1 // In Core 3.x, the default pins are 26 and 27. In Core 2.x, the defaults were 16 and 17.
-const int   cDXLDirPin          = 16; // 26; 
-const int   cRX                 = 18; // 16;
+const int   cDXLDirPin          = 16; // servo bus pins of the current PCB, as in software/Hexapod/PinMap.h
+const int   cRX                 = 18;
 const int   cTX                 = 17;
 const float cDXLProtocolVersion = 2.0;
 
@@ -22,7 +22,7 @@ const int cBaudRates[] = { 9600, 57600, 115200, 1000000, 2000000, 3000000, 40000
 const int cNumBauds    = sizeof(cBaudRates)/sizeof(cBaudRates[0]);
 
 const uint8_t cMinID = 0;
-const uint8_t cMaxID = 253;
+const uint8_t cMaxID = 252; // highest valid Dynamixel ID; 253-255 are reserved
 
 Dynamixel2Arduino dxl(DXL_SERIAL, cDXLDirPin);
 

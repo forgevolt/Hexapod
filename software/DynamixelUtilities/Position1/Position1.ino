@@ -3,7 +3,10 @@
 //             without stopping (decelerating).
 //             Method: waypoints, blend threshold, dxl.getPresentPosition to check if target 
 //                     reached
-//           
+//
+//            Historical: written for an early prototype board (direction pin 26, RX 16, TX 17,
+//            2 Mbaud on Serial2). It does not match the current PCB - see software/Hexapod/PinMap.h.
+//
 //            Christoph Streit - 2025
 // ---------------------------------------------------------------------------------------------
 

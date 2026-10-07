@@ -9,6 +9,10 @@ using namespace ControlTableItem;
 // ---- ServoBus --------------------------------------------------------------------------
 
 #define DXL_SERIAL Serial1 
+
+namespace
+{
+
 const float cDXLProtocolVersion = 2.0;
 const unsigned long cBaud       = 3000000; 
 
@@ -38,6 +42,8 @@ const uint16_t cTorqueEnableLen  = 1;
 // Address and length of control table item "Goal PWM"
 const uint16_t cGoalPWMAddr = 100;
 const uint16_t cGoalPWMLen  = 2;
+
+} // namespace
 
 // ----------------------------------------------------------------------------------------
 ServoBus::ServoBus(int dirPin, int rxPin, int txPin)

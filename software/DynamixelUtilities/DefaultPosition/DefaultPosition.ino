@@ -11,10 +11,10 @@
 using namespace ControlTableItem;
 using namespace std;
 
-#define DXL_SERIAL Serial2 // In Core 3.x, the default pins are 26 and 27. In Core 2.x, the defaults were 16 and 17.
-// #define DXL_SERIAL Serial1 // In Core 3.x, the default pins are 26 and 27. In Core 2.x, the defaults were 16 and 17.
-const int   cDXLDirPin          = 26; //16; // 26; 
-const int   cRX                 = 16; // 18; // 16;
+// Servo bus pins of the current PCB, as in software/Hexapod/PinMap.h.
+#define DXL_SERIAL Serial1
+const int   cDXLDirPin          = 16;
+const int   cRX                 = 18;
 const int   cTX                 = 17;
 const float cDXLProtocolVersion = 2.0;
 

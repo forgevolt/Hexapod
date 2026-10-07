@@ -2,7 +2,10 @@
 // Position2 — Changes the position of a single servo with a smooth transition between points 
 //             without stopping (decelerating).
 //             Method: Send GoalPosition at a high rate (100-200 Hz)
-//           
+//
+//            Historical: written for an early prototype board (direction pin 26, RX 16, TX 17,
+//            2 Mbaud on Serial2). It does not match the current PCB - see software/Hexapod/PinMap.h.
+//
 //            Christoph Streit - 2025
 // ---------------------------------------------------------------------------------------------
 
