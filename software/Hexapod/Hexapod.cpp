@@ -17,6 +17,7 @@ using namespace vectorutilities;
 #include <iterator>        // std::size
 #include <esp_system.h>    // esp_random()
 #include <esp_task_wdt.h>  // esp_task_wdt_add() / esp_task_wdt_reset() / esp_task_wdt_delete()
+#include <Preferences.h>   // NVS storage of the IMU's accelerometer offsets
 
 // ---- Hexapod ---------------------------------------------------------------------------
 
@@ -55,6 +56,35 @@ constexpr unsigned long cControlDataTimeoutMs = 250;
 AudioClip startupClip(cSoundStartupWAV);
 AudioClip shutdownClip(cSoundShutdownWAV);
 AudioClip errorClip(cSoundErrorWAV);
+
+// The IMU's accelerometer offsets define what it takes as level. They are stored in NVS, under
+// the same keys the Transmitter uses, so that "level" survives a reboot.
+static constexpr const char* cIMUPrefsNamespace = "IMU";
+
+// Returns false if none are stored yet, e.g. on the first boot.
+static bool loadIMUAccOffsets(MPU6050& imu)
+{
+  Preferences p;
+  if (p.begin(cIMUPrefsNamespace, true) == false || p.isKey("accXoffset") == false)
+    return false;
+
+  imu.setAccOffsets(p.getFloat("accXoffset"), p.getFloat("accYoffset"), p.getFloat("accZoffset"));
+  return true;
+}
+
+static void saveIMUAccOffsets(MPU6050& imu)
+{
+  Preferences p;
+  if (p.begin(cIMUPrefsNamespace, false) == false)
+  {
+    Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> cannot open NVS - IMU offsets not stored" << endl;
+    return;
+  }
+
+  p.putFloat("accXoffset", imu.getAccXoffset());
+  p.putFloat("accYoffset", imu.getAccYoffset());
+  p.putFloat("accZoffset", imu.getAccZoffset());
+}
 
 // Servo index -> Dynamixel ID and joint limits. Three consecutive entries per leg
 // (coxa, femur, tibia), in the same order as the index triples passed to myLegs.
@@ -201,7 +231,17 @@ bool Hexapod::begin(bool announceFault)
   Wire.setClock(cIMUBusClockHz);
   if (myIMU.begin() == 0)
   {
-    myIMU.calcOffsets(); // hexapod must sit flat on the floor when starting up
+    // The accelerometer offsets need a flat surface and are calibrated on request (levelIMU()).
+    // The gyro offsets only need the robot to be still, which it is at boot, and they drift
+    // between power-ups, so they are calibrated every time. With nothing stored yet, both are
+    // calibrated here, and the hexapod must sit flat on the floor.
+    if (loadIMUAccOffsets(myIMU) == true)
+      myIMU.calcOffsets(true, false);
+    else
+    {
+      myIMU.calcOffsets(true, true);
+      saveIMUAccOffsets(myIMU);
+    }
     myIMUHealthy = true;
   }
   else
@@ -458,7 +498,7 @@ void Hexapod::stepInitializing()
 // ----------------------------------------------------------------------------------------
 void Hexapod::stepReady()
 {
-  setButtonLabels(myGaitEngine.canChangeGait() ? "Stand up" : "", ""); 
+  setButtonLabels(myGaitEngine.canChangeGait() ? "Stand up" : "", myIMUHealthy ? "Level IMU" : "");
 
   // Lost connection to transmitter or power switch is off?
   if (isLinkHealthy() == false || isSwitchOn() == false)
@@ -472,6 +512,15 @@ void Hexapod::stepReady()
     myControlData.joyL = false; // process button press just once
     myGaitEngine.requestGait(&myStandUpGait, cStandUpFromParkedMs);
     changeState(HexapodState::eStanding);
+  }
+
+  // Right button pressed to calibrate what the IMU takes as level? The robot rests on its
+  // chassis here, so the IMU sits as flat as the floor. Done by peripheralsTask, which owns
+  // the I2C bus.
+  else if (myControlData.joyR == true && myIMUHealthy == true)
+  {
+    myControlData.joyR = false; // process button press just once
+    myIMULevelRequested = true;
   }
 
   // Idle after cWaitTimeUntilTorqueOff (60 s), i.e. turn servo torque off
@@ -755,6 +804,18 @@ void Hexapod::setButtonLabels(const char* btn1, const char* btn2)
 }
 
 // ----------------------------------------------------------------------------------------
+// Takes about a second (MPU6050_light averages 500 readings), during which the display pauses;
+// servo control runs on regardless, in the higher-priority schedulerTask.
+void Hexapod::levelIMU()
+{
+  myIMU.calcOffsets(false, true);
+  saveIMUAccOffsets(myIMU);
+
+  Serial << __PRETTY_FUNCTION__ << " -> IMU levelled, offsets stored" << endl;
+  mySound.play(mySound.signal());
+}
+
+// ----------------------------------------------------------------------------------------
 bool Hexapod::isLinkHealthy()
 {
   // Two independent conditions on purpose. isPaired() is the transport layer's opinion; the
@@ -997,7 +1058,15 @@ void Hexapod::peripheralsTask(void* pvParameters)
     {
       Wire.setClock(cIMUBusClockHz); // StatusDisplay leaves the bus at its own higher clock
       if (h->myIMUHealthy == true)
+      {
+        if (h->myIMULevelRequested.exchange(false) == true)
+        {
+          h->levelIMU();
+          lastWakeTime = xTaskGetTickCount(); // don't catch up on the periods it took
+        }
+
         h->myIMU.update();
+      }
       h->myStatusDisplay.update(); // no-op unless its own configured frame interval has elapsed
       h->myLeds.update();     // no-op unless its own frame interval has elapsed
     }

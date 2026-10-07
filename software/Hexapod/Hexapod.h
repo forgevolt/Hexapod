@@ -129,6 +129,10 @@ class Hexapod
     // a command has arrived recently enough to still be meaningful.
     bool isLinkHealthy();
 
+    // Called from peripheralsTask only, when myIMULevelRequested is set: recalibrates what the
+    // IMU takes as level and stores it.
+    void levelIMU();
+
     HexapodState myState = HexapodState::eOff;
     float myTimePassedMS = 0.0f;
 
@@ -165,6 +169,7 @@ class Hexapod
     SoundEngine mySound;           // I2S-based sound engine
     MPU6050 myIMU;                 // Onboard IMU, used by LevelGait to keep the body level on uneven terrain
     bool myIMUHealthy = false;     // set once in begin(), before the tasks start; see isIMUHealthy()
+    std::atomic<bool> myIMULevelRequested{false}; // set by stepReady(), taken by peripheralsTask
 
     // schedulerTask calls Hexapod::step() at a fixed interval (target is 200 times/second)
     static void schedulerTask(void* pvParameters);
