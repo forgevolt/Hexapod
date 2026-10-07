@@ -950,7 +950,7 @@ void Hexapod::schedulerTask(void* pvParameters)
 {
   // This task runs on core 1
 
-  Hexapod* h = (Hexapod*) pvParameters;
+  Hexapod* h = static_cast<Hexapod*>(pvParameters);
 
   constexpr unsigned long dt_ms = 1000 / cTargetUpdateRate;
 
@@ -1040,7 +1040,7 @@ void Hexapod::peripheralsTask(void* pvParameters)
   // it through a queue or atomics costs more than the defect is worth. Do not extend this to
   // anything whose corruption is not purely cosmetic.
 
-  Hexapod* h = (Hexapod*) pvParameters;
+  Hexapod* h = static_cast<Hexapod*>(pvParameters);
 
   constexpr unsigned long dt_ms = 1000 / cPeripheralsUpdateRate;
 

@@ -98,7 +98,7 @@ class GaitEngine
     };
     
   public:
-    GaitEngine(Hexapod& hexapod);
+    explicit GaitEngine(Hexapod& hexapod);
 
     // Update leg positions. 
     //   dt_ms is time passed in milliseconds.

@@ -34,7 +34,7 @@
 class Hexapod
 {
   public:
-    Hexapod(Receiver& receiver);
+    explicit Hexapod(Receiver& receiver);
     ~Hexapod();
 
     // announceFault: sound the error tone during startup even when initialization succeeds.

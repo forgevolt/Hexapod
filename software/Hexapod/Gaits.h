@@ -79,7 +79,7 @@ class Gait
 class ParkGait : public Gait 
 {
   public:
-    ParkGait(Hexapod& hexapod);
+    explicit ParkGait(Hexapod& hexapod);
 
     // ---- From class Gait
     void begin() override;
@@ -100,7 +100,7 @@ class ParkGait : public Gait
 class StandUpGait : public Gait 
 {
   public:
-    StandUpGait(Hexapod& hexapod);
+    explicit StandUpGait(Hexapod& hexapod);
 
     // ---- From class Gait
     void begin() override;
@@ -124,7 +124,7 @@ class StandUpGait : public Gait
 class PosingGait : public Gait 
 {
   public:
-    PosingGait(Hexapod& hexapod);
+    explicit PosingGait(Hexapod& hexapod);
 
     // ---- From class Gait
     void begin() override;
@@ -143,7 +143,7 @@ class PosingGait : public Gait
 class LevelGait : public Gait 
 {
   public:
-    LevelGait(Hexapod& hexapod);
+    explicit LevelGait(Hexapod& hexapod);
 
     // ---- From class Gait
     void begin() override;

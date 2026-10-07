@@ -63,7 +63,13 @@ class Receiver : public ESPNowConnection
 
     // Milliseconds since the last control frame was accepted from the peer. Unsigned
     // arithmetic, so correct across millis() rollover.
-    unsigned long timeSinceLastControlData() const { return millis() - myLastControlDataMs.load(); }
+    unsigned long timeSinceLastControlData() const
+    {
+      // The timestamp is loaded first. Read after millis(), a frame accepted in between would be
+      // newer than "now", and the unsigned difference would wrap to an age of about 49 days.
+      const unsigned long lastMs = myLastControlDataMs.load();
+      return millis() - lastMs;
+    }
 
     // The device type (EDeviceType) the transmitter announced when it last paired; eUndefined
     // before the first pairing. It cannot change while paired, so it is kept here rather than
