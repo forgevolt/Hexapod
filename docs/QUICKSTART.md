@@ -24,7 +24,7 @@ can do right now. A blank label means that control does nothing at the moment.
 | Control | Does |
 |---|---|
 | **Left button** | Stand up, or lie back down |
-| **Right button** | Change the walking style |
+| **Right button** | Change the walking style. While it lies down: set what counts as level (see below) |
 | **Switch 2** — *Adjust Gait* | Hold to change how it walks (see below) |
 | **Switch 3** — *Posing* | Feet stay put, the body moves |
 | **Switch 4** — *Balance* | The robot keeps itself level |
@@ -73,6 +73,10 @@ body copies you.
 the ground is not. Stand it on a slope and it will straighten up. It does not walk while
 doing this.
 
+If it holds itself a little crooked on flat ground, let it lie down on a level floor and press
+the **right button** (*Level IMU*). A short signal confirms it, and it remembers this from then
+on. This needs the two-joystick transmitter.
+
 Turn the switch off and it goes back to standing normally.
 
 ## What it is telling you
@@ -111,6 +115,7 @@ with a warning sound.
 |---|---|
 | **SERVO INIT FAILED** | The legs did not respond at startup. Switch it off and check that servo power is connected. **Do not ask it to stand.** |
 | **ABNORMAL RESET** | The last run ended badly rather than being switched off. It clears itself after twenty seconds. If it says *brownout*, the battery is probably low |
+| **IMU INIT FAILED** | The balance sensor did not respond at startup. Everything else works, but Balance will not level the robot. This one comes without the warning sound |
 
 **Nothing responds and it keeps pulsing red.** It has not found the transmitter. Check the
 transmitter is on and paired.

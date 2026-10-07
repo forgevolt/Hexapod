@@ -87,7 +87,7 @@ always the authority. This is what those labels mean.
 | **Switch 3** | `Posing` | On: pose the body with the feet planted |
 | **Switch 4** | `Balance` | On: the robot levels itself against the ground |
 | **Left button** | `Stand up` / `Park` | Stands up from parked, or parks from anything else |
-| **Right button** | `Change Gait` | While walking, cycles tripod → tetrapod → ripple |
+| **Right button** | `Change Gait` / `Level IMU` | While walking, cycles tripod → tetrapod → ripple. In Ready, sets what the robot takes as level (see [Balancing](#balancing)) |
 
 A button label is **blank whenever the button does nothing** — during a stand-up or park
 transition, for instance. That is deliberate feedback, not a fault.
@@ -124,6 +124,10 @@ between `cMinDurationMS` and `cMaxDurationMS`. Push gently and it walks slowly.
 
 Nothing needs to be switched on in a particular order. If the transmitter is already on when
 the robot boots, pairing completes as soon as the robot is up.
+
+**Keep the robot still while it boots.** The IMU calibrates its gyro then, which needs the
+robot still but not level. The very first boot also sets what the robot takes as level, so do
+that one on a level floor (see [Balancing](#balancing)).
 
 ## The five things it does
 
@@ -165,7 +169,7 @@ flowchart TD
 |---|---|---|
 | **Off** | on/off switch off | Torque released, display blank |
 | **Initializing** | power on, or the link drops | Legs folding to parked; controls ignored |
-| **Ready** | parked, transmitter paired | On the ground, waiting. `Stand up` available |
+| **Ready** | parked, transmitter paired | On the ground, waiting. `Stand up` and `Level IMU` available |
 | **Standing** | left button from Ready | Legs deployed, chassis level, ready to walk |
 | **Walking** | move a stick from Standing | Gait running |
 | **Posing** | Switch 3 | Feet planted, body moves |
@@ -254,6 +258,16 @@ the surface under it, and it compensates.
 Correction is clamped to about 20° (`cMaxCorrection`) and smoothed on top of the IMU's own
 filtering, so a jumpy reading does not produce jumpy servos.
 
+**What it takes as level** is stored on the robot and survives a reboot, so booting on a slope
+does not matter. If it holds its body slightly tilted on flat ground, put it on a level floor
+and press the right button (`Level IMU`) while it is Ready: the chassis rests on the floor
+then, so the IMU sits exactly as flat as the floor. The signal sound confirms it. `Level IMU`
+needs the two-joystick transmitter, since the one-joystick version has no right button. The
+very first boot sets this reference by itself.
+
+If the IMU does not answer at boot, the robot shows `IMU INIT FAILED` and levelling is off for
+that run: Switch 4 then leaves the robot standing without correcting.
+
 The robot does not walk while balancing. Turn Switch 4 off to stand normally.
 
 ## Reading the robot
@@ -316,8 +330,9 @@ The OLED shows faults as a crossed-eye face with two lines of text, overriding t
 |---|---|---|
 | `SERVO INIT FAILED` / `check servo bus` | The servo bus did not come up at boot | Check power and the bus wiring. **Do not command a stand** — the state machine will still reach Ready and let you try |
 | `ABNORMAL RESET` / *reason* | The last run ended in a panic, watchdog or brownout, not a clean power-off | Clears itself after 20 s. `brownout` means the supply dipped: suspect the battery or a stall |
+| `IMU INIT FAILED` / `levelling disabled` | The IMU did not answer at boot | Clears itself after 20 s. Everything works except balancing. Check the I2C wiring to the IMU |
 
-The error tone plays alongside either.
+The error tone plays with the servo and reset faults, not with the IMU one.
 
 ### Symptoms without a fault message
 
