@@ -195,11 +195,23 @@ bool Hexapod::begin(bool announceFault)
   mySound.setVolume(startupClip,  50);
   mySound.setVolume(shutdownClip, 50);
 
-  Wire.setClock(cIMUBusClockHz); // the display's begin() above left the bus at its own higher clock
-  myIMU.begin();       // shares the hardware I2C bus with the display; different address, no conflict
-  myIMU.calcOffsets(); // hexapod must sit flat on the floor when starting up
+  // The IMU shares the hardware I2C bus with the display; different address, no conflict.
+  // begin() only reports whether the IMU acknowledged its first register write, which is enough
+  // to tell a missing or unpowered one. Without it, the IMU is disabled rather than read.
+  Wire.setClock(cIMUBusClockHz);
+  if (myIMU.begin() == 0)
+  {
+    myIMU.calcOffsets(); // hexapod must sit flat on the floor when starting up
+    myIMUHealthy = true;
+  }
+  else
+    Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> IMU init failed - levelling disabled" << endl;
 
   changeState(HexapodState::eOff);
+
+  // Shown before the servo check below, so that a servo fault, the more serious one, replaces it.
+  if (myIMUHealthy == false)
+    myStatusDisplay.showError("IMU INIT FAILED", "levelling disabled");
 
   // A failed servo bus does not stop the state machine (see Hexapod.ino): it still reaches
   // eReady, but ServoBus moves nothing, so the robot only looks alive. The fault face and the
@@ -984,7 +996,8 @@ void Hexapod::peripheralsTask(void* pvParameters)
     if (h->myIsPeripheralsTaskRunning == true)
     {
       Wire.setClock(cIMUBusClockHz); // StatusDisplay leaves the bus at its own higher clock
-      h->myIMU.update();
+      if (h->myIMUHealthy == true)
+        h->myIMU.update();
       h->myStatusDisplay.update(); // no-op unless its own configured frame interval has elapsed
       h->myLeds.update();     // no-op unless its own frame interval has elapsed
     }

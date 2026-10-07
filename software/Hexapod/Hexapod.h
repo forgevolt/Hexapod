@@ -76,6 +76,10 @@ class Hexapod
     // do not call imu().update() or statusDisplay().update() from outside this class; that
     // would race with peripheralsTask on the same bus.
     MPU6050& imu()                 { return myIMU;           }
+
+    // False if the IMU did not answer in begin(). It is then disabled for the session. 
+    bool isIMUHealthy() const      { return myIMUHealthy;     }
+
     StatusDisplay& statusDisplay() { return myStatusDisplay;  }
     SoundEngine& sound()           { return mySound;          }
 
@@ -160,6 +164,7 @@ class Hexapod
     StatusDisplay myStatusDisplay; // eyes and fault reporting on the OLED screen
     SoundEngine mySound;           // I2S-based sound engine
     MPU6050 myIMU;                 // Onboard IMU, used by LevelGait to keep the body level on uneven terrain
+    bool myIMUHealthy = false;     // set once in begin(), before the tasks start; see isIMUHealthy()
 
     // schedulerTask calls Hexapod::step() at a fixed interval (target is 200 times/second)
     static void schedulerTask(void* pvParameters);

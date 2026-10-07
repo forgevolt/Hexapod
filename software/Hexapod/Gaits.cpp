@@ -261,12 +261,18 @@ void LevelGait::update(float, const GaitEngine::MotionCmd&)
   // and MPU6050_light's getAngleX()/Y() are plain member-variable accessors with no
   // multi-step computation that could be caught mid-update. Revisit if MPU6050_light
   // ever changes, or if this is ported to a platform without that atomicity guarantee.
-  float roll  = -myHexapod.imu().getAngleX() * deg2rad;
-  float pitch = -myHexapod.imu().getAngleY() * deg2rad;
-
+  //
+  // A disabled IMU (see Hexapod::isIMUHealthy()) reports nothing usable. The tilt is then taken
+  // as zero, so the body stays at no correction.
+  //
   // Yaw is deliberately left out: heading drift isn't a "level" problem and correcting it
   // would make the robot twist in place.
-  Vector3 rawTilt(roll, pitch, 0.0f);
+  Vector3 rawTilt(0.0f, 0.0f, 0.0f);
+  if (myHexapod.isIMUHealthy() == true)
+  {
+    rawTilt.x = -myHexapod.imu().getAngleX() * deg2rad; // roll
+    rawTilt.y = -myHexapod.imu().getAngleY() * deg2rad; // pitch
+  }
 
   // Low-pass filter the reading so servo motion stays smooth even if the IMU is noisy
   // or the robot is vibrating (e.g. from a nearby leg shifting weight).
