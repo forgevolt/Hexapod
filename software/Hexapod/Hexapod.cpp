@@ -195,6 +195,7 @@ bool Hexapod::begin(bool announceFault)
   mySound.setVolume(startupClip,  50);
   mySound.setVolume(shutdownClip, 50);
 
+  Wire.setClock(cIMUBusClockHz); // the display's begin() above left the bus at its own higher clock
   myIMU.begin();       // shares the hardware I2C bus with the display; different address, no conflict
   myIMU.calcOffsets(); // hexapod must sit flat on the floor when starting up
 
