@@ -7,6 +7,9 @@
 
 // ---- Receiver --------------------------------------------------------------------------
 
+namespace
+{
+
 // How long to wait for a transmitter to answer a pairing request before broadcasting again.
 constexpr unsigned long cPairingResponseTimeoutMs = 250;
 
@@ -23,11 +26,11 @@ static_assert(cHeartbeatIntervalMs * 2 <= ESPNowConnection::cPeerTimeoutMs,
 // A line printed from an ESP-NOW receive callback costs about 15 ms of wire time at 115200
 // baud, and Serial blocks once its TX buffer fills - time the WiFi task spends not processing
 // frames. The sites that can fire on every received frame report no more often than this.
-static constexpr unsigned long cLogIntervalMs = 1000;
+constexpr unsigned long cLogIntervalMs = 1000;
 
 // True at most once per cLogIntervalMs, against the caller's own timestamp. The first call
 // always reports, so a fault is never silent.
-static bool logDue(unsigned long& lastMs)
+bool logDue(unsigned long& lastMs)
 {
   const unsigned long now = millis();
 
@@ -37,6 +40,8 @@ static bool logDue(unsigned long& lastMs)
   lastMs = now;
   return true;
 }
+
+} // namespace
 
 // ----------------------------------------------------------------------------------------
 Receiver::Receiver()
@@ -343,7 +348,10 @@ void Receiver::onPairingResponseMsg(const PairingResponseData& pd, const uint8_t
 // Ingress validation. cJoystickMin/Max and cIMUAngleMin/Max declare the protocol's value domain;
 // these are what enforce it, so nothing outside it reaches the kinematics.
 
-static int16_t clampAxis(int16_t v)
+namespace
+{
+
+int16_t clampAxis(int16_t v)
 {
   return std::clamp(v, static_cast<int16_t>(cJoystickMin), static_cast<int16_t>(cJoystickMax));
 }
@@ -352,13 +360,15 @@ static int16_t clampAxis(int16_t v)
 // everything, so it survives std::clamp() - including the clamp at the point of use in
 // GaitEngine::step() - and then poisons lowPassFilter() permanently, because the filter feeds its
 // own output back in. This is the only layer that can catch it.
-static float sanitiseAngle(float a)
+float sanitiseAngle(float a)
 {
   if (std::isfinite(a) == false)
     return 0.0f;
 
   return std::clamp(a, cIMUAngleMin, cIMUAngleMax);
 }
+
+} // namespace
 
 // ----------------------------------------------------------------------------------------
 void Receiver::onAppMsg(uint8_t msgType, const void* data, size_t len, const PeerInfo&)

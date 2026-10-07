@@ -4,6 +4,9 @@
 
 // ---- Timing & effect parameters --------------------------------------------------------
 
+namespace
+{
+
 constexpr uint32_t cPulseIntervalMs    = 5;     // Frame interval for pulse effect (ms)
 constexpr uint32_t cSweepIntervalMs    = 10;    // Frame interval for sweep effects (ms)
 
@@ -13,6 +16,8 @@ constexpr uint8_t  cPulseMinBrightness = 20;    // Dimmest point of the pulse (0
 constexpr float    cSweepSpeed         = 1.3f;  // Pixels advanced per frame (lower = slower)
 constexpr uint8_t  cSweepTailLength    = 7;     // Number of LEDs in the fading tail
 constexpr CRGB     cSweepColor         = CRGB(220, 60, 0); // Warm orange-red comet color
+
+} // namespace
 
 
 // ---- IndicatorLeds ---------------------------------------------------------------------

@@ -5,9 +5,14 @@
 
 // ---- StatusDisplay ---------------------------------------------------------------------
 
+namespace
+{
+
 // The 8-pixel text font used for fault messages. Set once in begin() and never changed,
 // so getStrWidth() and drawStr() always measure and draw with the same metrics.
-static const uint8_t* const cTextFont = u8g2_font_helvR08_tr;
+const uint8_t* const cTextFont = u8g2_font_helvR08_tr;
+
+} // namespace
 
 
 // ---- Constructor -----------------------------------------------------------------------

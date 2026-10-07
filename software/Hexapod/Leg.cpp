@@ -7,6 +7,9 @@ using namespace vectorutilities;
 
 // ---- Leg -------------------------------------------------------------------------------
 
+namespace
+{
+
 // Leg segment geometry constants (in millimeters) measured between servo output shafts
 constexpr float cCoxaLength  = 42.35f;   // Coxa to femur joint distance 
 constexpr float cFemurLength = 95.0f;    // Femur length
@@ -17,6 +20,8 @@ constexpr float cTibiaLength = 174.981f; // Tibia length (joint to foot)
 // and are applied relative to the neutral (zero-angle) joint configuration.
 constexpr float cFemurOffsetAngleRad = 17.2f * deg2rad;
 constexpr float cTibiaOffsetAngleRad = -8.7f * deg2rad;
+
+} // namespace
 
 // ----------------------------------------------------------------------------------------
 Leg::Leg(LegId id, ServoBus& servoBus, size_t coxaServoIdx, size_t femurServoIdx, size_t tibiaServoIdx)

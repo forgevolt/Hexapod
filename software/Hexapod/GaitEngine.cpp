@@ -11,6 +11,9 @@ using namespace vectorutilities;
 
 // ---- Tuning ------------------------------------------------------------------------------
 
+namespace
+{
+
 // Right-stick deflection below this is ignored while SWITCH 2 selects the tuning axes. The
 // transmitter's Joystick class applies its own deadzone; this one matters because the tuning
 // values accumulate rather than track, so a small resting offset would drift them.
@@ -79,7 +82,7 @@ constexpr float cFinishDurationFactor = 2.0f;
 
 // ----------------------------------------------------------------------------------------
 // Signed millimeters per second for the given axis deflection.
-static float shapedRate(int axis, float ratePerS)
+float shapedRate(int axis, float ratePerS)
 {
   const float span   = static_cast<float>(cJoystickMax - cTuningDeadzone);
   const float travel = std::clamp((abs(axis) - cTuningDeadzone) / span, 0.0f, 1.0f);
@@ -89,6 +92,8 @@ static float shapedRate(int axis, float ratePerS)
 
   return (axis < 0) ? -magnitude : magnitude;
 }
+
+} // namespace
 
 
 // ---- GaitEngine ------------------------------------------------------------------------

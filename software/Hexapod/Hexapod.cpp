@@ -21,6 +21,9 @@ using namespace vectorutilities;
 
 // ---- Hexapod ---------------------------------------------------------------------------
 
+namespace
+{
+
 const int32_t cMinCoxa  = 1200, cMaxCoxa  = 3000; 
 const int32_t cMinFemur = 900,  cMaxFemur = 3500; 
 const int32_t cMinTibia = 200,  cMaxTibia = 2700; 
@@ -59,10 +62,10 @@ AudioClip errorClip(cSoundErrorWAV);
 
 // The IMU's accelerometer offsets define what it takes as level. They are stored in NVS, under
 // the same keys the Transmitter uses, so that "level" survives a reboot.
-static constexpr const char* cIMUPrefsNamespace = "IMU";
+constexpr const char* cIMUPrefsNamespace = "IMU";
 
 // Returns false if none are stored yet, e.g. on the first boot.
-static bool loadIMUAccOffsets(MPU6050& imu)
+bool loadIMUAccOffsets(MPU6050& imu)
 {
   Preferences p;
   if (p.begin(cIMUPrefsNamespace, true) == false || p.isKey("accXoffset") == false)
@@ -72,7 +75,7 @@ static bool loadIMUAccOffsets(MPU6050& imu)
   return true;
 }
 
-static void saveIMUAccOffsets(MPU6050& imu)
+void saveIMUAccOffsets(MPU6050& imu)
 {
   Preferences p;
   if (p.begin(cIMUPrefsNamespace, false) == false)
@@ -89,7 +92,7 @@ static void saveIMUAccOffsets(MPU6050& imu)
 // Servo index -> Dynamixel ID and joint limits. Three consecutive entries per leg
 // (coxa, femur, tibia), in the same order as the index triples passed to myLegs.
 struct ServoConfig { uint8_t id; int32_t minPos, maxPos; };
-static constexpr ServoConfig cServoConfig[] = {
+constexpr ServoConfig cServoConfig[] = {
   { 41, cMinCoxa, cMaxCoxa }, { 42, cMinFemur, cMaxFemur }, { 43, cMinTibia, cMaxTibia }, // LF
   { 51, cMinCoxa, cMaxCoxa }, { 52, cMinFemur, cMaxFemur }, { 53, cMinTibia, cMaxTibia }, // LM
   { 61, cMinCoxa, cMaxCoxa }, { 62, cMinFemur, cMaxFemur }, { 63, cMinTibia, cMaxTibia }, // LR
@@ -99,6 +102,8 @@ static constexpr ServoConfig cServoConfig[] = {
 };
 static_assert(std::size(cServoConfig) == static_cast<std::size_t>(ServoBus::cNumServos),
               "cServoConfig must have one entry per servo");
+
+} // namespace
 
 // ----------------------------------------------------------------------------------------
 Hexapod::Hexapod(Receiver& receiver)

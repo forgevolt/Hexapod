@@ -388,7 +388,7 @@ namespace
 
     return inside ? best : -best;
   }
-}
+} // namespace
 
 // ----------------------------------------------------------------------------------------
 GenericWalkingGait::GenericWalkingGait(Hexapod& hexapod, 
