@@ -54,8 +54,12 @@ const uint16_t ADDR_PRESENT_POS    = 132;
 void setup() 
 {
   Serial.begin(115200);
-  while (!Serial);
-    delay(500);  
+
+  // Waits for a serial monitor on purpose, with no timeout: setup() writes to the servos
+  // straight away, and this keeps it from doing so before anyone can see the output.
+  while (!Serial)
+    delay(10);
+  delay(500);
 
   Serial << "\n\nSW version from " << __DATE__ << " " << __TIME__ << endl;
   

@@ -33,11 +33,15 @@ vector<uint8_t> foundIDs;
 void setup() 
 {
   Serial.begin(115200);
-  while (!Serial);
-    delay(500);  
 
-  Serial << endl << "SW version from " << __DATE__ << " " << __TIME__ << endl;
-  
+  // Waits for a serial monitor on purpose, with no timeout: setup() writes to the servos
+  // straight away, and this keeps it from doing so before anyone can see the output.
+  while (!Serial)
+    delay(10);
+  delay(500);
+
+  Serial << "\n\nSW version from " << __DATE__ << " " << __TIME__ << endl;
+
   esp_log_level_set("*", ESP_LOG_VERBOSE);
 
   Serial << "Default pins:" << endl

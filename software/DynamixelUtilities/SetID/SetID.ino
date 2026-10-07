@@ -33,8 +33,12 @@ int foundBaud = 57600;
 void setup() 
 {
   Serial.begin(115200);
-  while (!Serial);
-    delay(500);  
+
+  // Waits for a serial monitor on purpose, with no timeout: this sketch is driven from the
+  // monitor, and the scan below prints which servo it found only once.
+  while (!Serial)
+    delay(10);
+  delay(500);
 
   Serial << "\n\nSW version from " << __DATE__ << " " << __TIME__ << endl;
   
