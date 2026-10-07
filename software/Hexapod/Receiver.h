@@ -8,6 +8,11 @@
 // ---- Receiver --------------------------------------------------------------------------
 // Contains the logic specific to the receiver. It connects to a peer (the transmitter).
 // The status is eNotPaired when no transmitter is "on air".
+//
+// Pairing is deliberately simple: the link is unencrypted, and the robot pairs with the first
+// transmitter that answers its broadcast. Anyone within radio range with a compatible
+// transmitter could therefore take control. ESP-NOW supports encrypted peers (PMK/LMK) if that
+// ever matters; for a hobby robot driven by its owner it was judged not worth the setup.
 
 class Receiver : public ESPNowConnection
 {
