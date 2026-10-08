@@ -165,6 +165,10 @@ void loop()
     if (diag.syncWriteFails != 0)
       Serial << "Servo: " << diag.syncWriteFails << " syncWrite failure(s)" << endl;
 
+    if (diag.torqueRefusals != 0)
+      Serial << "Servo: torque-on refused " << diag.torqueRefusals
+             << " time(s) - present positions could not be read" << endl;
+
     if (diag.overruns != 0)
       Serial << "Control loop: " << diag.overruns << " overrun(s), slowest step() "
              << diag.worstStepUs << " us" << endl;

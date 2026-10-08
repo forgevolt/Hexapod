@@ -43,6 +43,9 @@ const uint16_t cTorqueEnableLen  = 1;
 const uint16_t cGoalPWMAddr = 100;
 const uint16_t cGoalPWMLen  = 2;
 
+// How often syncReadPresentPosition() tries before it gives up.
+constexpr int cReadAttempts = 3;
+
 } // namespace
 
 // ----------------------------------------------------------------------------------------
@@ -231,6 +234,17 @@ void ServoBus::setTorque(int16_t goalPWMRaw)
   if (myAllServosAreConfigured == false)
     return;
 
+  // Switching torque on makes each servo hold its goal register. Coming from off, those goals are
+  // only trustworthy once the present positions have been read since torque went off: after a
+  // failed read the caller would have seeded them from stale positions, and the servos would
+  // drive to positions they are not in. Leave torque off instead; the next attempt reads again.
+  if (myTorqueIsOn == false && myPositionsAreFresh == false)
+  {
+    ++myTorqueRefusals;
+    myTorqueRefusedLatch = true;
+    return;
+  }
+
   for (int i=0; i<cNumServos; i++)
     myPWMWriteData[i].goal_pwm = goalPWMRaw;
 
@@ -244,6 +258,7 @@ void ServoBus::setTorque(int16_t goalPWMRaw)
 
   // Broadcast write: one packet, no status replies - the same pattern setTorqueOff() uses.
   myDXL.torqueOn(DXL_BROADCAST_ID);
+  myTorqueIsOn = true;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -265,6 +280,19 @@ void ServoBus::setTorqueOff()
     return;
 
   myDXL.torqueOff(DXL_BROADCAST_ID);
+
+  // Servos without torque can be moved by hand, so positions read before this point no longer
+  // count.
+  myTorqueIsOn        = false;
+  myPositionsAreFresh = false;
+}
+
+// ----------------------------------------------------------------------------------------
+bool ServoBus::takeTorqueRefusal()
+{
+  const bool refused = myTorqueRefusedLatch;
+  myTorqueRefusedLatch = false;
+  return refused;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -282,7 +310,7 @@ bool ServoBus::isAllTorqueOn()
 
   // A servo that does not answer cannot be confirmed as torqued on, and "off" is the safe
   // answer: the caller then re-reads present positions and re-seeds the goals instead of
-  // assuming the leg is holding where it thinks it is.
+  // assuming the servos are holding where it thinks they are.
   if (recvCnt != cNumServos)
     return false;
 
@@ -305,9 +333,9 @@ void ServoBus::setGoalPosition(int index, int32_t goalPos)
   if (isValidIndex(index) == false)
     return;
 
-  // Clamp rather than reject. Discarding the command left this joint at its previous goal while
-  // the other two joints of the leg moved on - a kinematically inconsistent pose, held at
-  // whatever PWM setTorque() last applied.
+  // Clamp rather than reject. Discarding the command would leave this servo at its previous goal
+  // while the servos commanded with it moved on - for a jointed mechanism, an inconsistent pose,
+  // held at whatever PWM setTorque() last applied.
   const int32_t clamped = std::clamp(goalPos, myServos[index].minPos, myServos[index].maxPos);
 
   if (clamped != goalPos)
@@ -334,6 +362,7 @@ ServoBus::Diagnostics ServoBus::fetchDiagnostics()
 
   d.clampedGoals   = myClampedGoals.exchange(0);
   d.syncWriteFails = mySyncWriteFails.exchange(0);
+  d.torqueRefusals = myTorqueRefusals.exchange(0);
 
   d.worstGoalOvershoot = myWorstGoalOvershoot;
   d.worstGoalServo     = myWorstGoalServo;
@@ -408,30 +437,36 @@ bool ServoBus::syncReadPresentPosition()
   if (myAllServosAreConfigured == false)
     return false;
 
-  // Rebuild the instruction packet on every call. This descriptor shares the library's internal
-  // packet buffer with the Torque Enable read in isAllTorqueOn(), so the packet left in that
-  // buffer by the other descriptor must not be reused.
-  mySyncReadInfos.is_info_changed = true;
-
-  uint8_t recv_cnt = myDXL.syncRead(&mySyncReadInfos);
-
-  if (recv_cnt == 0)
+  for (int attempt = 1; attempt <= cReadAttempts; attempt++)
   {
-    Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> dxl.syncRead failed, lib error code: " << myDXL.getLastLibErrCode() << endl;
-    return false;
-  }
-  else if (recv_cnt < cNumServos)
-  {
-    Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> dxl.syncRead failed, recv_cnt < cNumServos: " << recv_cnt << endl;
-    return false;
+    // Rebuild the instruction packet on every call. This descriptor shares the library's internal
+    // packet buffer with the Torque Enable read in isAllTorqueOn(), so the packet left in that
+    // buffer by the other descriptor must not be reused.
+    mySyncReadInfos.is_info_changed = true;
+
+    const uint8_t recv_cnt = myDXL.syncRead(&mySyncReadInfos);
+
+    if (recv_cnt == cNumServos)
+    {
+      for (int i=0; i<cNumServos; i++)
+      {
+        myServos[i].presentPos = mySyncReadData[i].present_position;
+      }
+
+      myPositionsAreFresh = true;
+      return true;
+    }
+
+    if (attempt == cReadAttempts && recv_cnt == 0)
+      Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> dxl.syncRead failed " << cReadAttempts
+             << " times, lib error code: " << myDXL.getLastLibErrCode() << endl;
+    else if (attempt == cReadAttempts)
+      Serial << "ERROR: " << __PRETTY_FUNCTION__ << " -> dxl.syncRead failed " << cReadAttempts
+             << " times, last recv_cnt < cNumServos: " << recv_cnt << endl;
   }
 
-  for (int i=0; i<cNumServos; i++)
-  {
-    myServos[i].presentPos = mySyncReadData[i].present_position;
-  }
-
-  return true;
+  myPositionsAreFresh = false;
+  return false;
 }
 
 // ----------------------------------------------------------------------------------------

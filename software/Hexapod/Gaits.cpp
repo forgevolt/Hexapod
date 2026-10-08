@@ -18,20 +18,25 @@ ParkGait::ParkGait(Hexapod& hexapod)
 // ----------------------------------------------------------------------------------------
 void ParkGait::begin() 
 {
-  // Get present position of each leg
-  myHexapod.servoBus().syncReadPresentPosition();
+  // Torque on: start from the current goals, no read needed. Torque off: start from the present
+  // positions and seed them as goals before torque comes on, so no servo snaps to a stale goal.
+  // If that read fails, ServoBus refuses the torque-on and the legs stay limp.
+  const bool fromPresent = (myHexapod.servoBus().isAllTorqueOn() == false) &&
+                           (myHexapod.servoBus().syncReadPresentPosition() == true);
+
   for (std::size_t i = idx(LegId::LF); i <= idx(LegId::RR); i++)
   {
-    myStart[i] = myHexapod.leg(i).getPresentPosition();
-
-    // Seed the goal position with where the leg actually is *before* torque gets
-    // enabled below. Otherwise setSafeTorque() would make the servo hold whatever
-    // stale goal was left in its onboard register from before this gait (or before
-    // this boot) - potentially snapping toward it at full speed for the one scheduler
-    // tick before update() gets a chance to compute the real interpolated position.
-    myHexapod.leg(i).setPosition(myStart[i]);
+    if (fromPresent == true)
+    {
+      myStart[i] = myHexapod.leg(i).getPresentPosition();
+      myHexapod.leg(i).setPosition(myStart[i]);
+    }
+    else
+      myStart[i] = myHexapod.leg(i).getCurrentGoal();
   }
-  myHexapod.servoBus().syncWrite();
+
+  if (fromPresent == true)
+    myHexapod.servoBus().syncWrite();
 
   myCanChange = false;
   myHexapod.servoBus().setSafeTorque();
@@ -109,10 +114,11 @@ void StandUpGait::begin()
 
   myMaxDistance = 0.0f;
 
-  if (myHexapod.servoBus().isAllTorqueOn() == false)
+  // As in ParkGait::begin(): from the present positions when torque is off and they can be read,
+  // otherwise from the current goals. A failed read leaves torque off - see setMaxTorque().
+  if (myHexapod.servoBus().isAllTorqueOn() == false &&
+      myHexapod.servoBus().syncReadPresentPosition() == true)
   {
-    // Get present position of each leg
-    myHexapod.servoBus().syncReadPresentPosition();
     for (std::size_t i = idx(LegId::LF); i <= idx(LegId::RR); i++)
     {
       myStart[i] = myHexapod.leg(i).getPresentPosition();

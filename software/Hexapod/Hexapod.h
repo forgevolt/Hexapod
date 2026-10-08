@@ -65,6 +65,7 @@ class Hexapod
       int32_t  worstGoalOvershoot = 0;  // ticks; meaningless when clampedGoals == 0
       int      worstGoalServo     = -1;
       uint32_t syncWriteFails     = 0;
+      uint32_t torqueRefusals     = 0;  // torque-on refused: present positions could not be read
 
       // ---- Control loop
       uint32_t overruns           = 0;  // passes that missed the cTargetUpdateRate deadline

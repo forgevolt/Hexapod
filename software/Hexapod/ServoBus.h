@@ -87,9 +87,17 @@ class ServoBus
     // configureServo() must be called for each servo before calling begin().
     void configureServo(int index, uint8_t id, int32_t minPos, int32_t maxPos);
 
+    // Set the PWM limit and switch torque on. Switching it on from off is refused - counted,
+    // torque left off - unless syncReadPresentPosition() has succeeded since torque last went
+    // off: otherwise each servo would hold a goal seeded from positions it is not in.
     void setMaxTorque();
     void setSafeTorque();
     void setTorqueOff();
+
+    // True once after setMaxTorque()/setSafeTorque() refused to switch torque on, then false
+    // until the next refusal. For the control task, to raise a fault; fetchDiagnostics() counts
+    // the same events for the log.
+    bool takeTorqueRefusal();
 
     // Checks if torque is currently enabled for every servo.
     // Returns true only if torque is ON for ALL servos, false if even one is off (or
@@ -104,13 +112,16 @@ class ServoBus
     int32_t currentGoal(int index) const;
 
     bool syncWrite();                // fast write goal positions to all servos on the bus
-    bool syncReadPresentPosition();  // fast read present position for all servos on the bus
+    // Fast read of the present position of every servo on the bus. Retried a few times, since
+    // most failures on a half-duplex bus are one-off; on failure the previous positions remain.
+    bool syncReadPresentPosition();
 
     // Conditions the control task detects but cannot usefully act on.
     struct Diagnostics
     {
       uint32_t clampedGoals   = 0; // servo goals clamped to the configured joint limits
       uint32_t syncWriteFails = 0;
+      uint32_t torqueRefusals = 0; // torque-on refused: present positions could not be read
 
       // Worst servo-goal violation since the last fetch, in ticks, and which servo index.
       // Meaningless when clampedGoals == 0.
@@ -160,6 +171,12 @@ class ServoBus
     // Atomic: incremented on the control task, exchanged to 0 from loop().
     std::atomic<uint32_t> myClampedGoals{0};
     std::atomic<uint32_t> mySyncWriteFails{0};
+    std::atomic<uint32_t> myTorqueRefusals{0};
+
+    // Torque-on guard - see setMaxTorque(). Control task only.
+    bool myTorqueIsOn         = false; // as last commanded; begin() leaves torque off
+    bool myPositionsAreFresh  = false; // a position read has succeeded since torque went off
+    bool myTorqueRefusedLatch = false; // see takeTorqueRefusal()
 
     // Worst-case detail for the clamp counter. Plain members, not atomic: only the control task
     // writes them and only loop() reads them, and the worst consequence of a torn read is one

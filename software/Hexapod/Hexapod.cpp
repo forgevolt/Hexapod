@@ -196,6 +196,7 @@ Hexapod::Diagnostics Hexapod::fetchDiagnostics()
   result.worstGoalOvershoot = servo.worstGoalOvershoot;
   result.worstGoalServo     = servo.worstGoalServo;
   result.syncWriteFails     = servo.syncWriteFails;
+  result.torqueRefusals     = servo.torqueRefusals;
 
   result.overruns    = myOverruns.exchange(0);
   result.worstStepUs = myWorstStepUs.exchange(0);
@@ -338,6 +339,12 @@ void Hexapod::step(float dt_ms)
   // timeouts start to drift. That needs a single uninterrupted state lasting longer
   // than the ~15 min battery allows, so it is not reachable on this hardware.
   myTimePassedMS += dt_ms;
+
+  // ServoBus refused to switch torque on because the present positions could not be read (see
+  // ServoBus::setMaxTorque()). Untethered, the limp legs would otherwise go unexplained. Called
+  // from the control task like the other display setters - see the note in peripheralsTask().
+  if (myServoBus.takeTorqueRefusal() == true)
+    myStatusDisplay.showError("SERVO READ FAILED", "torque stays off");
 
   // Check new commands from remote
   if (myReceiver.hasNewControlData())
