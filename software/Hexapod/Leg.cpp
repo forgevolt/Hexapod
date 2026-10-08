@@ -133,7 +133,13 @@ bool Leg::setPosition(const Vector3& pos)
     if (fabsf(overshoot) > fabsf(myWorstOvershoot))
       myWorstOvershoot = overshoot;
 
-    // Handle gracefully: clamp to the nearest reachable length
+    // Too close: hold the previous goals. Projecting onto the inner edge would fold the knee
+    // almost completely, and near the fold acosf() changes so fast that the joints jump far more
+    // in one tick than a servo can follow. The leg resumes as soon as the target is reachable.
+    if (overshoot < 0.0f)
+      return false;
+
+    // Too far: clamp to the nearest reachable length, i.e. stretch towards the target.
     l = std::clamp(l, fabsf(cFemurLength - cTibiaLength), cFemurLength + cTibiaLength);
   }
 

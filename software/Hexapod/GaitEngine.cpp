@@ -202,9 +202,9 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
       myParams.stepLength += shapedRate(input.RX, cStepLengthRatePerS) * (dt_ms * 0.001f);
       myParams.stepLength  = std::clamp(myParams.stepLength, cMinStepLength, cMaxStepLength);
 
-      // The Y-axis sets ground clearance. Negated so that RY positive raises the body, the
-      // same direction the axis moves it without SWITCH 2 held.
-      // Valid range: [cMaxGroundClearance, cMinGroundClearance]
+      // The Y-axis sets ground clearance. Negated so that RY positive raises the body (a more
+      // negative clearance), the same direction the axis moves it without SWITCH 2 held.
+      // Valid range: [cMaxGroundClearance (highest body), cMinGroundClearance (lowest body)]
       myParams.groundClearance += shapedRate(-input.RY, cGroundClearanceRatePerS) * (dt_ms * 0.001f);
       myParams.groundClearance  = std::clamp(myParams.groundClearance,
                                              cMaxGroundClearance, cMinGroundClearance);
@@ -353,9 +353,9 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
   }
 
   // RY always means ground clearance. Held with SWITCH 2 it accumulates into myParams above
-  // and persists; on its own it only trims, hinged on the tuned value - full deflection
-  // reaches cMinGroundClearance one way and cMaxGroundClearance the other, and centring the
-  // stick returns the robot to the tuned clearance.
+  // and persists; on its own it only trims, hinged on the tuned value - pulled fully back it
+  // lowers the body to cMinGroundClearance, pushed fully forward it raises it to
+  // cMaxGroundClearance, and centring the stick returns the robot to the tuned clearance.
   //
   // The trim is never written back to myParams. Outside a locomotion gait, or while SWITCH 2
   // is held, it eases back to zero.

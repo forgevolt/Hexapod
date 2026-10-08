@@ -53,8 +53,9 @@ class GaitEngine
     };
 
     // ----- Clearance
-    // NOTE: "more negative" = the chassis sits lower (further below the coxa joints),
-    // so cMinGroundClearance (-60) is numerically *larger* than cMaxGroundClearance
+    // NOTE: the clearance is the feet's height below the coxa joints, so "more negative" = the
+    // feet further below = the chassis sits higher. cMinGroundClearance (-60) is the lowest
+    // body position and numerically *larger* than cMaxGroundClearance
     // (-150) - the names describe the clearance extremes, not ascending numeric order.
     // Every clamp() call site already passes these in the correct low/high numeric
     // order; if you ever "fix" the apparent min/max swap here, check those call sites.

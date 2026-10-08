@@ -62,8 +62,9 @@ class Leg
   public:
     // Computes servo angles for 'pos' using an inverse kinematics algorithm.
     // Sets the goal positions of the leg's servos.
-    // Returns true if the position is reachable, false if it had to be clamped to the
-    // nearest reachable point (the leg is still moved to that clamped position).
+    // Returns true if the position is reachable, false if not. A target beyond the leg's reach
+    // is clamped to the nearest reachable point and the leg moved there; a target closer than the
+    // folded leg can reach leaves the servo goals unchanged.
     bool setPosition(const Vector3& pos);
 
     // Computes the leg's end-effector position from the given servo angles
