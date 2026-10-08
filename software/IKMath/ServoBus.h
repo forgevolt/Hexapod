@@ -73,6 +73,11 @@ class ServoBus
     // Number of servos on the bus.
     static constexpr int cNumServos = 18;
 
+    // Factory default of Position P Gain. A lower gain (e.g. 400) gives smoother motion and
+    // removes the slight jitter of an unloaded servo, but the servo then falls further behind
+    // fast-moving goals.
+    static constexpr uint16_t cDefaultPositionPGain = 700;
+
     // Configures half-duplex UART communication for the servo bus.
     //   dirPin - Transceiver direction control pin (TX/RX toggle)
     //   rxPin, txPin - UART pins
@@ -84,8 +89,10 @@ class ServoBus
     // (including if any single servo's configuration write fails - see class comment).
     bool begin();
 
-    // configureServo() must be called for each servo before calling begin().
-    void configureServo(int index, uint8_t id, int32_t minPos, int32_t maxPos);
+    // configureServo() must be called for each servo before calling begin(), which writes
+    // positionPGain to the servo's Position P Gain.
+    void configureServo(int index, uint8_t id, int32_t minPos, int32_t maxPos,
+                        uint16_t positionPGain = cDefaultPositionPGain);
 
     // Set the PWM limit and switch torque on. Switching it on from off is refused - counted,
     // torque left off - unless syncReadPresentPosition() has succeeded since torque last went
@@ -159,6 +166,7 @@ class ServoBus
       bool isConfigured = false;
       uint8_t id = 0;
       int32_t minPos = 0, maxPos = 0;
+      uint16_t positionPGain = cDefaultPositionPGain;
       int32_t goalPos = 2048;    // center/neutral tick, so an accidental early syncWrite()
       int32_t presentPos = 2048; // (torque is off at that point regardless - see class
                                   // comment) writes a harmless, defined value rather than

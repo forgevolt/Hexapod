@@ -91,16 +91,23 @@ void saveIMUAccOffsets(MPU6050& imu)
   p.putFloat("accZoffset", imu.getAccZoffset());
 }
 
-// Servo index -> Dynamixel ID and joint limits. Three consecutive entries per leg
+// Position P gain per joint. The coxa needs the factory gain to keep up with the swing at full
+// stick; femur and tibia run softer, because their lag rounds off touchdown and load transfer -
+// at 700 the robot stomps.
+constexpr uint16_t cCoxaPGain  = 700;
+constexpr uint16_t cFemurPGain = 400;
+constexpr uint16_t cTibiaPGain = 400;
+
+// Servo index -> Dynamixel ID, joint limits and P gain. Three consecutive entries per leg
 // (coxa, femur, tibia), in the same order as the index triples passed to myLegs.
-struct ServoConfig { uint8_t id; int32_t minPos, maxPos; };
+struct ServoConfig { uint8_t id; int32_t minPos, maxPos; uint16_t pGain; };
 constexpr ServoConfig cServoConfig[] = {
-  { 41, cMinCoxa, cMaxCoxa }, { 42, cMinFemur, cMaxFemur }, { 43, cMinTibia, cMaxTibia }, // LF
-  { 51, cMinCoxa, cMaxCoxa }, { 52, cMinFemur, cMaxFemur }, { 53, cMinTibia, cMaxTibia }, // LM
-  { 61, cMinCoxa, cMaxCoxa }, { 62, cMinFemur, cMaxFemur }, { 63, cMinTibia, cMaxTibia }, // LR
-  { 11, cMinCoxa, cMaxCoxa }, { 12, cMinFemur, cMaxFemur }, { 13, cMinTibia, cMaxTibia }, // RF
-  { 21, cMinCoxa, cMaxCoxa }, { 22, cMinFemur, cMaxFemur }, { 23, cMinTibia, cMaxTibia }, // RM
-  { 31, cMinCoxa, cMaxCoxa }, { 32, cMinFemur, cMaxFemur }, { 33, cMinTibia, cMaxTibia }, // RR
+  { 41, cMinCoxa, cMaxCoxa, cCoxaPGain }, { 42, cMinFemur, cMaxFemur, cFemurPGain }, { 43, cMinTibia, cMaxTibia, cTibiaPGain }, // LF
+  { 51, cMinCoxa, cMaxCoxa, cCoxaPGain }, { 52, cMinFemur, cMaxFemur, cFemurPGain }, { 53, cMinTibia, cMaxTibia, cTibiaPGain }, // LM
+  { 61, cMinCoxa, cMaxCoxa, cCoxaPGain }, { 62, cMinFemur, cMaxFemur, cFemurPGain }, { 63, cMinTibia, cMaxTibia, cTibiaPGain }, // LR
+  { 11, cMinCoxa, cMaxCoxa, cCoxaPGain }, { 12, cMinFemur, cMaxFemur, cFemurPGain }, { 13, cMinTibia, cMaxTibia, cTibiaPGain }, // RF
+  { 21, cMinCoxa, cMaxCoxa, cCoxaPGain }, { 22, cMinFemur, cMaxFemur, cFemurPGain }, { 23, cMinTibia, cMaxTibia, cTibiaPGain }, // RM
+  { 31, cMinCoxa, cMaxCoxa, cCoxaPGain }, { 32, cMinFemur, cMaxFemur, cFemurPGain }, { 33, cMinTibia, cMaxTibia, cTibiaPGain }, // RR
 };
 static_assert(std::size(cServoConfig) == static_cast<std::size_t>(ServoBus::cNumServos),
               "cServoConfig must have one entry per servo");
@@ -131,7 +138,8 @@ Hexapod::Hexapod(Receiver& receiver)
   myIsPeripheralsTaskRunning(false)
 {
   for (int i = 0; i < ServoBus::cNumServos; i++)
-    myServoBus.configureServo(i, cServoConfig[i].id, cServoConfig[i].minPos, cServoConfig[i].maxPos);
+    myServoBus.configureServo(i, cServoConfig[i].id, cServoConfig[i].minPos, cServoConfig[i].maxPos,
+                              cServoConfig[i].pGain);
 
   // cWaveGaitConfig and cCrawlGaitConfig are defined in Gaits.h but not enabled here.
   // Adding either to the initializer above also requires raising cNumWalkingGaits.

@@ -117,9 +117,7 @@ bool ServoBus::begin()
     ok &= myDXL.writeControlTableItem(PROFILE_ACCELERATION, myServos[i].id, 0); // infinite acceleration time ('0 [msec]')
     ok &= myDXL.writeControlTableItem(PROFILE_VELOCITY, myServos[i].id, 0);     // '0' represents an infinite velocity (max speed)
 
-    // Default 700. A lower gain such as 400 removes the slight jitter of an unloaded servo, but the
-    // servo then falls further behind fast-moving goals.
-    ok &= myDXL.writeControlTableItem(POSITION_P_GAIN, myServos[i].id, 700);
+    ok &= myDXL.writeControlTableItem(POSITION_P_GAIN, myServos[i].id, myServos[i].positionPGain); // see cDefaultPositionPGain
     ok &= myDXL.writeControlTableItem(POSITION_I_GAIN, myServos[i].id, 0);   // default 0
     ok &= myDXL.writeControlTableItem(POSITION_D_GAIN, myServos[i].id, 0);   // default 0
 
@@ -205,7 +203,8 @@ bool ServoBus::begin()
 }
 
 // ----------------------------------------------------------------------------------------
-void ServoBus::configureServo(int index, uint8_t id, int32_t minPos, int32_t maxPos) 
+void ServoBus::configureServo(int index, uint8_t id, int32_t minPos, int32_t maxPos,
+                              uint16_t positionPGain)
 {
   if (isValidIndex(index) == false)
     return;
@@ -228,6 +227,7 @@ void ServoBus::configureServo(int index, uint8_t id, int32_t minPos, int32_t max
   myServos[index].id           = id;
   myServos[index].minPos       = minPos;
   myServos[index].maxPos       = maxPos;
+  myServos[index].positionPGain = positionPGain;
 }
 
 // ----------------------------------------------------------------------------------------
