@@ -331,8 +331,10 @@ The OLED shows faults as a crossed-eye face with two lines of text, overriding t
 | `SERVO INIT FAILED` / `check servo bus` | The servo bus did not come up at boot | Check power and the bus wiring. **Do not command a stand** — the state machine will still reach Ready and let you try |
 | `ABNORMAL RESET` / *reason* | The last run ended in a panic, watchdog or brownout, not a clean power-off | Clears itself after 20 s. `brownout` means the supply dipped: suspect the battery or a stall |
 | `IMU INIT FAILED` / `levelling disabled` | The IMU did not answer at boot | Clears itself after 20 s. Everything works except balancing. Check the I2C wiring to the IMU |
+| `SERVO READ FAILED` / `torque stays off` | The servo positions could not be read when torque was due to come on, so the legs stay limp rather than jump to stale positions | Clears itself after 20 s. The next park or stand-up reads again. If it repeats, check the bus wiring and servo power |
+| `BATTERY LOW` / *voltage* | The pack has dropped below 10.5 V (3.5 V per cell), smoothed over a few seconds | Shown for 20 s with the error tone, and again every minute while the pack stays low. Park and swap or charge the pack |
 
-The error tone plays with the servo and reset faults, not with the IMU one.
+The error tone plays with the servo init, reset and battery faults, not with the IMU or servo read ones.
 
 ### Symptoms without a fault message
 
@@ -357,4 +359,4 @@ radio dropouts look exactly like this.
 Connect USB and open the monitor at **115200 baud**. The robot detects the USB connection at
 boot and only then waits for the port and logs verbosely; on battery it boots straight through
 and logs warnings only. Every state change is printed, which is usually enough to see what it
-thought you asked for.
+thought you asked for. Every 10 s it also prints the battery voltage.

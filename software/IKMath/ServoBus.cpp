@@ -23,8 +23,10 @@ const int32_t cPWMLimitRaw = 885;
 const int16_t cMaxPWMRaw   = 885; // 100 %
 const int16_t cSafePWMRaw  = 442; //  50 %
 
-// Low-voltage backstop written to each servo's MIN_VOLTAGE_LIMIT, in the control table's
-// unit of 0.1 V. 99 = 9.9 V = 3.3 V/cell on a 3S LiPo.
+// Written to each servo's MIN_VOLTAGE_LIMIT, in the control table's unit of 0.1 V.
+// 99 = 9.9 V = 3.3 V/cell on a 3S LiPo. Below it the servo flags an input voltage error, but that
+// is an alert only: Shutdown (item 63) keeps its default, which leaves input voltage out, so the
+// servo keeps running.
 const int32_t cMinVoltageLimit = 99;
 
 // Address and length of control table item "Goal Position"
@@ -365,6 +367,7 @@ ServoBus::Diagnostics ServoBus::fetchDiagnostics()
   d.clampedGoals   = myClampedGoals.exchange(0);
   d.syncWriteFails = mySyncWriteFails.exchange(0);
   d.torqueRefusals = myTorqueRefusals.exchange(0);
+  d.voltageReadFails = myVoltageReadFails.exchange(0);
 
   d.worstGoalOvershoot = myWorstGoalOvershoot;
   d.worstGoalServo     = myWorstGoalServo;
@@ -469,6 +472,23 @@ bool ServoBus::syncReadPresentPosition()
 
   myPositionsAreFresh = false;
   return false;
+}
+
+// ----------------------------------------------------------------------------------------
+float ServoBus::readInputVoltage(int index)
+{
+  if (myAllServosAreConfigured == false || isValidIndex(index) == false)
+    return 0.0f;
+
+  const int32_t raw = myDXL.readControlTableItem(PRESENT_INPUT_VOLTAGE, myServos[index].id);
+
+  if (myDXL.getLastLibErrCode() != DXL_LIB_OK)
+  {
+    ++myVoltageReadFails;
+    return 0.0f;
+  }
+
+  return raw * 0.1f; // control table unit: 0.1 V
 }
 
 // ----------------------------------------------------------------------------------------

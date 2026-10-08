@@ -88,10 +88,10 @@ void setup()
 
   // Why did the last run end? Anything other than a power-on or a deliberate reset means it ended
   // abnormally - a panic, a watchdog timeout, or the supply dipping. Unchecked, such a reboot is
-  // indistinguishable from a normal start. With no battery monitoring in hardware,
-  // ESP_RST_BROWNOUT is also the only evidence that a run ended because the pack gave out rather
-  // than because of a firmware fault. Logged here, before anything else can report an error of
-  // its own.
+  // indistinguishable from a normal start. The robot reads the pack voltage while it runs, but
+  // that log is gone after a reboot, so ESP_RST_BROWNOUT is the evidence that a run ended because
+  // the pack gave out rather than because of a firmware fault. Logged here, before anything else
+  // can report an error of its own.
   const esp_reset_reason_t resetReason = esp_reset_reason();
   const bool abnormalReset = (resetReason != ESP_RST_POWERON &&
                               resetReason != ESP_RST_EXT &&
@@ -144,7 +144,7 @@ void loop()
 
   // Report what the control task counted, at most once per second and never from the control
   // task itself. Silence means nothing was clamped, every bus write succeeded and the control
-  // loop kept its rate.
+  // loop kept its rate. The one exception is the battery line, logged every 10 s.
   static unsigned long lastDiagReport = 0;
   if (currentMillis - lastDiagReport >= 1000)
   {
@@ -172,6 +172,17 @@ void loop()
     if (diag.overruns != 0)
       Serial << "Control loop: " << diag.overruns << " overrun(s), slowest step() "
              << diag.worstStepUs << " us" << endl;
+
+    if (diag.voltageReadFails != 0)
+      Serial << "Servo: " << diag.voltageReadFails << " voltage read failure(s)" << endl;
+
+    // A level rather than an event, so logged on a timer instead of only when something happened.
+    static unsigned long lastBatteryReport = 0;
+    if (diag.batteryVolts > 0.0f && currentMillis - lastBatteryReport >= 10000)
+    {
+      lastBatteryReport = currentMillis;
+      Serial << "Battery: " << _FLOAT(diag.batteryVolts, 1) << " V" << endl;
+    }
   }
 
   // Yield execution to lower-priority tasks / system IDLE task

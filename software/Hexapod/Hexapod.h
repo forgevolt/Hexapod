@@ -66,6 +66,8 @@ class Hexapod
       int      worstGoalServo     = -1;
       uint32_t syncWriteFails     = 0;
       uint32_t torqueRefusals     = 0;  // torque-on refused: present positions could not be read
+      uint32_t voltageReadFails   = 0;
+      float    batteryVolts       = 0.0f; // smoothed; a level, not a count; 0 = not read yet
 
       // ---- Control loop
       uint32_t overruns           = 0;  // passes that missed the cTargetUpdateRate deadline
@@ -138,6 +140,10 @@ class Hexapod
     // IMU takes as level and stores it.
     void levelIMU();
 
+    // Called from step(): reads the battery voltage once per cBatteryReadIntervalMS and, while it
+    // is low, shows a warning and plays the error sound once a minute.
+    void monitorBattery(float dt_ms);
+
     HexapodState myState = HexapodState::eOff;
     float myTimePassedMS = 0.0f;
 
@@ -175,6 +181,13 @@ class Hexapod
     MPU6050 myIMU;                 // Onboard IMU, used by LevelGait to keep the body level on uneven terrain
     bool myIMUHealthy = false;     // set once in begin(), before the tasks start; see isIMUHealthy()
     std::atomic<bool> myIMULevelRequested{false}; // set by stepReady(), taken by peripheralsTask
+
+    // Battery monitoring - see monitorBattery(). Control task only, except that fetchDiagnostics()
+    // reads myBatteryVolts; a torn read there only skews one log line.
+    float         myBatteryTimerMS  = 0.0f;
+    float         myBatteryVolts    = 0.0f;
+    bool          myBatteryIsLow    = false;
+    unsigned long myBatteryWarnedAt = 0;     // millis() of the last warning; 0 = none yet
 
     // schedulerTask calls Hexapod::step() at a fixed interval (target is 200 times/second)
     static void schedulerTask(void* pvParameters);

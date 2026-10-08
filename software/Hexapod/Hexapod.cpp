@@ -13,6 +13,7 @@ using namespace vectorutilities;
 #include "sounds/Error.h"
 
 #include <cmath>           // roundf
+#include <cstdio>          // snprintf
 #include <cstring>         // strcmp
 #include <iterator>        // std::size
 #include <esp_system.h>    // esp_random()
@@ -32,6 +33,19 @@ const int32_t cMinTibia = 200,  cMaxTibia = 2700;
 
 // We target 'cTargetUpdateRate' servo position updates per second
 constexpr unsigned long cTargetUpdateRate = 200;
+
+// Battery warning. The voltage is read from one servo: all of them hang on the same pack and
+// differ only by the drop in the wiring, a few tenths of a volt under load. 10.5 V is 3.5 V per
+// cell on a 3S LiPo. Smoothed, because the voltage dips for a moment whenever the legs pull hard;
+// the hysteresis stops a voltage hovering at the threshold from switching between low and good.
+// While low, the warning repeats every cBatteryWarnRepeatMS, since the display clears a fault
+// after 20 s.
+constexpr int           cBatterySenseServo     = 0;       // servo index, not Dynamixel ID
+constexpr float         cBatteryReadIntervalMS = 1000.0f;
+constexpr float         cBatteryLowV           = 10.5f;
+constexpr float         cBatteryHysteresisV    = 0.3f;
+constexpr float         cBatterySmoothing      = 0.3f;    // weight of each new reading: ~3 s time constant
+constexpr unsigned long cBatteryWarnRepeatMS   = 60000;
 
 // Display + IMU run on a separate, lower-priority task; this bounds it to the IMU's
 // intended poll rate. StatusDisplay::update() self-throttles to its own configured fps,
@@ -179,6 +193,48 @@ Hexapod::~Hexapod()
 }
 
 // ----------------------------------------------------------------------------------------
+void Hexapod::monitorBattery(float dt_ms)
+{
+  myBatteryTimerMS += dt_ms;
+  if (myBatteryTimerMS < cBatteryReadIntervalMS)
+    return;
+
+  myBatteryTimerMS = 0.0f;
+
+  const float volts = myServoBus.readInputVoltage(cBatterySenseServo);
+  if (volts <= 0.0f) // read failed, counted by ServoBus
+    return;
+
+  myBatteryVolts = (myBatteryVolts == 0.0f)
+                 ? volts
+                 : myBatteryVolts + cBatterySmoothing * (volts - myBatteryVolts);
+
+  if (myBatteryVolts < cBatteryLowV)
+  {
+    myBatteryIsLow = true;
+  }
+  else if (myBatteryVolts > cBatteryLowV + cBatteryHysteresisV)
+  {
+    myBatteryIsLow    = false;
+    myBatteryWarnedAt = 0; // a later drop warns at once
+  }
+
+  if (myBatteryIsLow == false)
+    return;
+
+  const unsigned long now = millis();
+  if (myBatteryWarnedAt != 0 && now - myBatteryWarnedAt < cBatteryWarnRepeatMS)
+    return;
+
+  myBatteryWarnedAt = now;
+
+  char detail[16];
+  snprintf(detail, sizeof(detail), "%.1f V", myBatteryVolts);
+  myStatusDisplay.showError("BATTERY LOW", detail);
+  mySound.play(errorClip);
+}
+
+// ----------------------------------------------------------------------------------------
 Hexapod::Diagnostics Hexapod::fetchDiagnostics()
 {
   Diagnostics result;
@@ -205,6 +261,8 @@ Hexapod::Diagnostics Hexapod::fetchDiagnostics()
   result.worstGoalServo     = servo.worstGoalServo;
   result.syncWriteFails     = servo.syncWriteFails;
   result.torqueRefusals     = servo.torqueRefusals;
+  result.voltageReadFails   = servo.voltageReadFails;
+  result.batteryVolts       = myBatteryVolts;
 
   result.overruns    = myOverruns.exchange(0);
   result.worstStepUs = myWorstStepUs.exchange(0);
@@ -353,6 +411,8 @@ void Hexapod::step(float dt_ms)
   // from the control task like the other display setters - see the note in peripheralsTask().
   if (myServoBus.takeTorqueRefusal() == true)
     myStatusDisplay.showError("SERVO READ FAILED", "torque stays off");
+
+  monitorBattery(dt_ms);
 
   // Check new commands from remote
   if (myReceiver.hasNewControlData())

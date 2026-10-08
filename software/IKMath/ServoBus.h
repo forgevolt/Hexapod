@@ -123,12 +123,18 @@ class ServoBus
     // most failures on a half-duplex bus are one-off; on failure the previous positions remain.
     bool syncReadPresentPosition();
 
+    // Present Input Voltage of one servo, in volts, or 0 if the read failed (counted in
+    // Diagnostics). A single read, well under a millisecond on the bus - unlike a sync read of
+    // every servo, which takes about 4.5 ms.
+    float readInputVoltage(int index);
+
     // Conditions the control task detects but cannot usefully act on.
     struct Diagnostics
     {
       uint32_t clampedGoals   = 0; // servo goals clamped to the configured joint limits
       uint32_t syncWriteFails = 0;
       uint32_t torqueRefusals = 0; // torque-on refused: present positions could not be read
+      uint32_t voltageReadFails = 0;
 
       // Worst servo-goal violation since the last fetch, in ticks, and which servo index.
       // Meaningless when clampedGoals == 0.
@@ -180,6 +186,7 @@ class ServoBus
     std::atomic<uint32_t> myClampedGoals{0};
     std::atomic<uint32_t> mySyncWriteFails{0};
     std::atomic<uint32_t> myTorqueRefusals{0};
+    std::atomic<uint32_t> myVoltageReadFails{0};
 
     // Torque-on guard - see setMaxTorque(). Control task only.
     bool myTorqueIsOn         = false; // as last commanded; begin() leaves torque off
