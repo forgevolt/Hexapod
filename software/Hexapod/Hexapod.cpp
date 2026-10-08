@@ -390,9 +390,16 @@ void Hexapod::step(float dt_ms)
     break;
   }
 
+  // Off, Initializing and Ready take no stick input. A walking gait still finishing its cycle
+  // there gets zeros, so it winds down and parks even while the stick is held.
   if (myGaitEngine.currentGait() != nullptr)
   {
-    myGaitEngine.step(dt_ms, myControlData);
+    const bool takesInput = (myState != HexapodState::eOff &&
+                             myState != HexapodState::eInitializing &&
+                             myState != HexapodState::eReady);
+    const Receiver::ControlData noInput;
+
+    myGaitEngine.step(dt_ms, takesInput ? myControlData : noInput);
   }
 
   // Telemetry is pushed only when a value changes: setMessage() takes Receiver's mutex, which
