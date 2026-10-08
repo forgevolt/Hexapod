@@ -151,14 +151,14 @@ class LevelGait : public Gait
     bool canChange() const override { return true; }
 
   private:
-    Vector3 myFilteredTilt = Vector3(0, 0, 0); // extra smoothing on top of the IMU's own filter,
-                                               // to keep servo motion gentle even if the sensor
-                                               // reading is momentarily jumpy
+    Vector3 myCorrection = Vector3(0, 0, 0); // roll/pitch applied to the body, in radians
 
     // Tuning constants - adjust to taste
-    // 0..1, higher = snappier but noisier. Applied once per control tick, so it depends on
-    // cTargetUpdateRate: at 200 Hz, 0.1 is a time constant of about 47 ms.
-    static constexpr float cFilterAlpha    = 0.1f;
+    // Fraction of the measured body tilt added to the correction per control tick. Higher levels
+    // faster but, against the IMU's 50 Hz updates and the servos' lag, can start to oscillate.
+    // Applied once per tick, so it depends on cTargetUpdateRate: at 200 Hz, 0.02 removes a tilt
+    // with a time constant of about 0.25 s. Tuned on the robot.
+    static constexpr float cCorrectionGain = 0.02f;
     static constexpr float cMaxCorrection  = 0.35f; // radians (~20 deg), safety clamp on correction
 };
 

@@ -246,7 +246,7 @@ LevelGait::LevelGait(Hexapod& hexapod)
 void LevelGait::begin() 
 {
   // Start from "no correction" so we ease into the current tilt rather than snapping to it
-  myFilteredTilt = Vector3(0, 0, 0);
+  myCorrection = Vector3(0, 0, 0);
 
   myHexapod.servoBus().setMaxTorque();
 }
@@ -263,7 +263,8 @@ void LevelGait::update(float, const GaitEngine::MotionCmd&)
   // ever changes, or if this is ported to a platform without that atomicity guarantee.
   //
   // A disabled IMU (see Hexapod::isIMUHealthy()) reports nothing usable. The tilt is then taken
-  // as zero, so the body stays at no correction.
+  // as zero, so the correction stays where it is - at zero, since the IMU is only ever disabled
+  // from boot.
   //
   // Yaw is deliberately left out: heading drift isn't a "level" problem and correcting it
   // would make the robot twist in place.
@@ -274,14 +275,17 @@ void LevelGait::update(float, const GaitEngine::MotionCmd&)
     rawTilt.y = -myHexapod.imu().getAngleY() * deg2rad; // pitch
   }
 
-  // Low-pass filter the reading so servo motion stays smooth even if the IMU is noisy
-  // or the robot is vibrating (e.g. from a nearby leg shifting weight).
-  myFilteredTilt = lerp(myFilteredTilt, rawTilt, cFilterAlpha);
+  // The IMU sits on the body, so it measures the ground's tilt *plus* the correction already
+  // applied. Taking the reading as the correction therefore settled at half the ground tilt.
+  // Taken as an error and integrated instead, the correction keeps growing until the body
+  // reads level. The integration also smooths the servo motion if the IMU is noisy or the
+  // robot vibrates (e.g. from a nearby leg shifting weight).
+  myCorrection += rawTilt * cCorrectionGain;
 
-  // Safety clamp - avoid extreme corrections e.g. if the robot is picked up or on its side
-  Vector3 correction = myFilteredTilt;
-  correction.x = std::clamp(correction.x, -cMaxCorrection, cMaxCorrection);
-  correction.y = std::clamp(correction.y, -cMaxCorrection, cMaxCorrection);
+  // Safety clamp - avoid extreme corrections e.g. if the robot is picked up or on its side.
+  // Clamping the integrator itself, not a copy, keeps it from winding up past the limit.
+  myCorrection.x = std::clamp(myCorrection.x, -cMaxCorrection, cMaxCorrection);
+  myCorrection.y = std::clamp(myCorrection.y, -cMaxCorrection, cMaxCorrection);
 
   const GaitEngine::GaitParams& params = myHexapod.gaitParams();
 
@@ -294,7 +298,7 @@ void LevelGait::update(float, const GaitEngine::MotionCmd&)
     // Counter-rotate each leg's attachment point opposite to the measured tilt.
     // This is the same trick PosingGait uses for transmitter-commanded rotation,
     // just fed by the IMU instead of the pilot.
-    pos = rotateXYZ(pos, -correction);
+    pos = rotateXYZ(pos, -myCorrection);
 
     myHexapod.leg(i).setPosition(pos);
   }
