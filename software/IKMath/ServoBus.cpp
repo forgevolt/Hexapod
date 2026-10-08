@@ -117,7 +117,9 @@ bool ServoBus::begin()
     ok &= myDXL.writeControlTableItem(PROFILE_ACCELERATION, myServos[i].id, 0); // infinite acceleration time ('0 [msec]')
     ok &= myDXL.writeControlTableItem(PROFILE_VELOCITY, myServos[i].id, 0);     // '0' represents an infinite velocity (max speed)
 
-    ok &= myDXL.writeControlTableItem(POSITION_P_GAIN, myServos[i].id, 400); // default 700, tested with 400
+    // Default 700. A lower gain such as 400 removes the slight jitter of an unloaded servo, but the
+    // servo then falls further behind fast-moving goals.
+    ok &= myDXL.writeControlTableItem(POSITION_P_GAIN, myServos[i].id, 700);
     ok &= myDXL.writeControlTableItem(POSITION_I_GAIN, myServos[i].id, 0);   // default 0
     ok &= myDXL.writeControlTableItem(POSITION_D_GAIN, myServos[i].id, 0);   // default 0
 
