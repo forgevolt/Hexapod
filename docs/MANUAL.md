@@ -332,6 +332,7 @@ The OLED shows faults as a crossed-eye face with two lines of text, overriding t
 | `ABNORMAL RESET` / *reason* | The last run ended in a panic, watchdog or brownout, not a clean power-off | Clears itself after 20 s. `brownout` means the supply dipped: suspect the battery or a stall |
 | `IMU INIT FAILED` / `levelling disabled` | The IMU did not answer at boot | Clears itself after 20 s. Everything works except balancing. Check the I2C wiring to the IMU |
 | `SERVO READ FAILED` / `torque stays off` | The servo positions could not be read when torque was due to come on, so the legs stay limp rather than jump to stale positions | Clears itself after 20 s. The next park or stand-up reads again. If it repeats, check the bus wiring and servo power |
+| `SERVO READ FAILED` / `check servo bus` | A position read failed while torque was on, e.g. a leg's bus cable came loose. The legs that answer park from where they were told to be | Clears itself after 20 s. Check the bus wiring and servo power, then switch off and on |
 | `BATTERY LOW` / *voltage* | The pack has dropped below 10.5 V (3.5 V per cell), smoothed over a few seconds | Shown for 20 s with the error tone, and again every minute while the pack stays low. Park and swap or charge the pack |
 
 The error tone plays with the servo init, reset and battery faults, not with the IMU or servo read ones.

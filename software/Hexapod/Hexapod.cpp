@@ -406,11 +406,14 @@ void Hexapod::step(float dt_ms)
   // than the ~15 min battery allows, so it is not reachable on this hardware.
   myTimePassedMS += dt_ms;
 
-  // ServoBus refused to switch torque on because the present positions could not be read (see
-  // ServoBus::setMaxTorque()). Untethered, the limp legs would otherwise go unexplained. Called
-  // from the control task like the other display setters - see the note in peripheralsTask().
+  // A position read failed, with or without a torque-on refusal as a result. Shown so limp legs
+  // do not go unexplained when untethered; the refusal says more, so it wins.
+  const bool readFailed = myServoBus.takeReadFailure();
+
   if (myServoBus.takeTorqueRefusal() == true)
     myStatusDisplay.showError("SERVO READ FAILED", "torque stays off");
+  else if (readFailed == true)
+    myStatusDisplay.showError("SERVO READ FAILED", "check servo bus");
 
   monitorBattery(dt_ms);
 

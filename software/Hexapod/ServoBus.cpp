@@ -300,6 +300,14 @@ bool ServoBus::takeTorqueRefusal()
 }
 
 // ----------------------------------------------------------------------------------------
+bool ServoBus::takeReadFailure()
+{
+  const bool failed = myReadFailedLatch;
+  myReadFailedLatch = false;
+  return failed;
+}
+
+// ----------------------------------------------------------------------------------------
 bool ServoBus::isAllTorqueOn()
 {
   if (myAllServosAreConfigured == false)
@@ -471,6 +479,7 @@ bool ServoBus::syncReadPresentPosition()
   }
 
   myPositionsAreFresh = false;
+  myReadFailedLatch   = true;
   return false;
 }
 

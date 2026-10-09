@@ -116,7 +116,7 @@ with a warning sound.
 | **SERVO INIT FAILED** | The legs did not respond at startup. Switch it off and check that servo power is connected. **Do not ask it to stand.** |
 | **ABNORMAL RESET** | The last run ended badly rather than being switched off. It clears itself after twenty seconds. If it says *brownout*, the battery is probably low |
 | **IMU INIT FAILED** | The balance sensor did not respond at startup. Everything else works, but Balance will not level the robot. This one comes without the warning sound |
-| **SERVO READ FAILED** | The robot could not tell where its legs are, so it leaves them limp instead of moving them blindly. It tries again with the next park or stand-up. If it keeps happening, switch off and check the servo cables. This one comes without the warning sound |
+| **SERVO READ FAILED** | The robot could not tell where its legs are. If its legs were limp, it leaves them limp instead of moving them blindly and tries again with the next park or stand-up; if it was standing, a leg may have lost its connection. If it keeps happening, switch off and check the servo cables. This one comes without the warning sound |
 | **BATTERY LOW** | The battery is nearly empty. The message and the sound come back every minute until you park the robot and change or charge the battery |
 
 **Nothing responds and it keeps pulsing red.** It has not found the transmitter. Check the

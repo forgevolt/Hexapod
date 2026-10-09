@@ -106,6 +106,11 @@ class ServoBus
     // the same events for the log.
     bool takeTorqueRefusal();
 
+    // True once after syncReadPresentPosition() failed, then false until the next failure. The
+    // same use as takeTorqueRefusal(), for reads that fail while torque is already on: nothing
+    // is refused then, but a servo that does not answer is out of control.
+    bool takeReadFailure();
+
     // Checks if torque is currently enabled for every servo.
     // Returns true only if torque is ON for ALL servos, false if even one is off (or
     // if servos aren't configured at all). 
@@ -192,6 +197,7 @@ class ServoBus
     bool myTorqueIsOn         = false; // as last commanded; begin() leaves torque off
     bool myPositionsAreFresh  = false; // a position read has succeeded since torque went off
     bool myTorqueRefusedLatch = false; // see takeTorqueRefusal()
+    bool myReadFailedLatch    = false; // see takeReadFailure()
 
     // Worst-case detail for the clamp counter. Plain members, not atomic: only the control task
     // writes them and only loop() reads them, and the worst consequence of a torn read is one
