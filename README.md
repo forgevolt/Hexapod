@@ -146,7 +146,7 @@ against:
 | U8g2 | 2.36.19 | |
 | Streaming | 6.3.0 | |
 | [SoundEngine](https://github.com/forgevolt/SoundEngine) | 1.1.1 | I2S mixing and the compiled-in clips |
-| [ESPNowUtilities](https://github.com/forgevolt/ESPNowUtilities) | 1.0.0 | the ESP-NOW transport `RCProtocol.h` is built on |
+| [ESPNowUtilities](https://github.com/forgevolt/ESPNowUtilities) | 1.0.1 | the ESP-NOW transport `RCProtocol.h` is built on |
 | [VectorUtilities](https://github.com/forgevolt/VectorUtilities) | 1.0.0 | `Vector2`/`Vector3`, rotations and the motion curves of the gaits |
 
 The last three are written for this project and its transmitter. All three are in the Arduino

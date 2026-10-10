@@ -55,20 +55,29 @@ static_assert(cTuningExpo >= 0.0f && cTuningExpo <= 1.0f,
 // this power, so 1.0 is a plain linear map, and values below it give more stride for less
 // stick - at 0.7 a fifth of travel yields a third of the step length instead of a fifth.
 //
-// Cadence is not shaped: myDurationMS still follows magnitude linearly, so a small deflection
-// means normal-length steps taken slowly rather than short steps.
+// The cadence is shaped separately - see cSpeedExpo - so a small deflection means fairly long
+// steps taken slowly rather than short quick ones.
 constexpr float cStrideCurve = 0.7f;
 
 static_assert(cStrideCurve > 0.0f && cStrideCurve <= 1.0f,
               "cStrideCurve outside (0, 1] would shorten the stride or overshoot the maximum");
 
 // Deflection at which the stride reaches the full step length. Past this the stride is
-// clamped, so the remaining travel only raises cadence - myDurationMS keeps following the
+// clamped, so the remaining travel only raises cadence - the cycle rate keeps following the
 // stick over the whole range.
 constexpr float cStrideFullAt = 0.6f;
 
 static_assert(cStrideFullAt > 0.0f && cStrideFullAt <= 1.0f,
               "cStrideFullAt outside (0, 1] would put full stride out of reach or at rest");
+
+// The cycle rate (1 / cycle time) follows the stick, blended like cTuningExpo: 0 is linear,
+// larger is gentler near the centre. Mapping the cycle time itself made the speed a hyperbola,
+// flat for most of the travel and steep at the end - the last 20 % of travel added 60 % of the
+// top speed; at 0.6 it adds 33 %. The slowest and fastest cycle are unchanged.
+constexpr float cSpeedExpo = 0.6f;
+
+static_assert(cSpeedExpo >= 0.0f && cSpeedExpo <= 1.0f,
+              "cSpeedExpo outside [0, 1] makes the response non-monotonic near center");
 
 
 // Time constant for the fall of MotionCmd::demand. Only the fall is filtered; a rise is taken
@@ -261,9 +270,11 @@ void GaitEngine::step(float dt_ms, const Receiver::ControlData& input)
 
     if (isCommanded == true)
     {
-      // Target duration based on current input
-      float targetDuration = mapf(magnitude, 0.0f, 1.0f, cMaxDurationMS, minDuration);
-      myDurationMS = lowPassFilter(myDurationMS, targetDuration, 500.0f, dt_ms);
+      // Target cycle rate based on current input - see cSpeedExpo. Filtered as a rate too, so a
+      // stick step changes the speed at the same pace at every deflection.
+      const float shaped     = cSpeedExpo * magnitude * magnitude * magnitude + (1.0f - cSpeedExpo) * magnitude;
+      const float targetRate = mapf(shaped, 0.0f, 1.0f, 1.0f / cMaxDurationMS, 1.0f / minDuration);
+      myDurationMS = 1.0f / lowPassFilter(1.0f / myDurationMS, targetRate, 500.0f, dt_ms);
     }
     else 
     {
