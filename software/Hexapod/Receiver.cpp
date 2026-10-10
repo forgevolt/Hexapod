@@ -13,14 +13,15 @@ namespace
 // How long to wait for a transmitter to answer a pairing request before broadcasting again.
 constexpr unsigned long cPairingResponseTimeoutMs = 250;
 
-// Cadence of the link maintenance task. The heartbeat must beat the peer's timeout with margin,
-// or the far end declares us lost between beats.
+// Cadence of the link maintenance task. The telemetry is our heartbeat, and the far end drops us
+// after cPeerTimeoutMs without one. Lost frames are routine at 2.4 GHz, so two in a row must not
+// matter.
 constexpr unsigned long cLinkTaskPeriodMs    = 50;
 constexpr unsigned long cPairingIntervalMs   = 250;
-constexpr unsigned long cHeartbeatIntervalMs = 500;
+constexpr unsigned long cHeartbeatIntervalMs = 200;
 
-static_assert(cHeartbeatIntervalMs * 2 <= ESPNowConnection::cPeerTimeoutMs,
-              "heartbeat interval must beat cPeerTimeoutMs with margin");
+static_assert((cHeartbeatIntervalMs + cLinkTaskPeriodMs) * 3 <= ESPNowConnection::cPeerTimeoutMs,
+              "two heartbeats in a row must be able to go missing within cPeerTimeoutMs");
 
 
 // A line printed from an ESP-NOW receive callback costs about 15 ms of wire time at 115200
