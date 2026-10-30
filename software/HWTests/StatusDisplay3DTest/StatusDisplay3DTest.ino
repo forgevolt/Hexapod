@@ -1,7 +1,6 @@
 // ---- StatusDisplay3DTest ---------------------------------------------------------------
 // Tries out the 3D eyes and the sleepy mood on their own, with no hexapod, no servos and no
-// sound. StatusDisplay.h/.cpp here are a copy of the hexapod's, extended with
-// setPerspective() and Mood::eSleepy; nothing in software/Hexapod uses them yet.
+// sound. StatusDisplay.h/.cpp here are a copy of the hexapod's.
 //
 // With perspective on, the eyes sit on a round shell that turns with the gaze: the shell moves
 // and resizes each eye, which is then drawn as usual. With the gaze centred they must look

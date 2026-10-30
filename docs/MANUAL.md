@@ -301,6 +301,9 @@ The strip is mounted rotated 180°, which is why the sweep names look inverted i
 While walking the eyes track your steering stick, so they look the way the robot is being
 sent. Under `Adjust Gait` they track the left stick regardless.
 
+The eyes sit on a round head that turns with the gaze: looking to one side, the near eye grows
+and the far one narrows.
+
 ### The transmitter screen
 
 Four live values from the robot: `Clearance`, `Step Length`, `Step Height` and `Gait Type`.

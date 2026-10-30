@@ -64,5 +64,5 @@ them in step.
 | Sketch | Needs | Checks |
 |---|---|---|
 | `StatusDisplayTest/` | an SH1106 OLED on I2C | Walks the whole `StatusDisplay` API - eyes, moods, blinking, the fault face - holding each step long enough to watch and logging what it is showing |
-| `StatusDisplay3DTest/` | an SH1106 OLED on I2C | Tries out the 3D eyes and the sleepy mood. Its `StatusDisplay` is an extended copy that the firmware does not use yet |
+| `StatusDisplay3DTest/` | an SH1106 OLED on I2C | Sweeps the gaze through every mood to check the 3D eyes, logging the slowest `update()` per step. `d` switches to the flat eyes for comparison |
 | `tone/` | the I2S amplifier | Plays C5-E5-G5. Enough to tell wiring from software |

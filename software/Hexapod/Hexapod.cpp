@@ -297,6 +297,10 @@ bool Hexapod::begin(bool announceFault)
   myStatusDisplay.setAutoBlinker(true, 3, 2); // blink every 3 s ± up to 2 s variation
   myStatusDisplay.setIdleMode(true, 2, 2);    // reposition every 2 s ± up to 2 s variation
 
+  // The eyes sit on a round shell that turns with the gaze: looking aside, the near eye grows
+  // and the far one narrows, instead of both just sliding across the screen.
+  myStatusDisplay.setPerspective(StatusDisplay::Perspective::eResize);
+
   // Deliberately not folded into 'result': only servo initialization determines whether begin()
   // succeeds. A silent robot is not a reason to refuse to walk.
   if (mySound.begin() == false)

@@ -26,6 +26,8 @@
 //
 // - Eyes: two rounded rectangles that tween toward their configured size and position,
 //   blink on a timer, and take on a mood by masking parts of the eye with background.
+//   With perspective on, the eyes sit on a round shell that turns with the gaze instead of
+//   sliding across the screen - see setPerspective().
 // - Error: a fault face (crossed eyes) above two lines of text, entered by showError()
 //   and held until clearError(). Errors override the eyes entirely.
 //
@@ -44,7 +46,15 @@ class StatusDisplay
       eDefault = 0, // plain eyes
       eTired,       // upper outer corners masked, giving a drooping lid
       eFocused,     // upper inner corners masked, giving brows drawn together
-      eHappy        // reshaped into an arc, giving a smiling squint
+      eHappy,       // reshaped into an arc, giving a smiling squint
+      eSleepy       // one half-closed lid and one thin slit that swap sides; nods off now and then
+    };
+
+    // How the gaze is shown.
+    enum class Perspective : uint8_t
+    {
+      eFlat = 0, // the eyes slide across the screen, as they always have
+      eResize    // the shell moves and resizes each eye, which is then drawn as usual
     };
 
     explicit StatusDisplay();
@@ -90,6 +100,10 @@ class StatusDisplay
     // Aim the gaze directly. x and y are clamped to [-1, +1], where -1 is left/top and
     // +1 is right/bottom of the reachable range. Overrides idle mode for that frame.
     void setLookDirection(float x, float y = 0.0f);
+
+    // Show the eyes as if painted on a round shell that turns with the gaze, instead of
+    // sliding them across the screen. With the gaze centred both look exactly the same.
+    void setPerspective(Perspective perspective);
 
 
     // ---- Fault reporting -------------------------------------------------------------
@@ -137,14 +151,15 @@ class StatusDisplay
     // Mood masks, as a fraction of the eye's height: how deep the lid cuts in.
     static constexpr int cLidDepthDivisor = 3;
 
-    // Geometry of the happy arc. The band is height/cArchThickDivisor thick, and its lower
-    // edge is lifted off the eye's bottom by the given fraction of the room available. Raise
-    // the numerator toward the denominator for a taller arc: at 1/1 the apex reaches the top
-    // of the eye, which spans the full height but leaves the arc looking like a tunnel.
-    static constexpr int cArchThickDivisor    = 4;
-    static constexpr int cArchLiftNumerator   = 3;
-    static constexpr int cArchLiftDenominator = 4;
-    static constexpr int cArchMinThickness    = 3;
+    // Geometry of the happy arc: a curved band with rounded ends, bending down from its top to
+    // the eye's sides, thickest at the top and tapering towards the ends (equal values give an
+    // even band). It is sized from the eye's width, so it keeps its shape when the eyes are
+    // made taller.
+    static constexpr float cHappyThickness    = 0.27f; // stroke width at the top, x eye width
+    static constexpr float cHappyEndThickness = 0.12f; //                 at the ends
+    static constexpr float cHappyMinThickness = 3.0f;  // pixels
+    static constexpr float cHappySpanDeg      = 62.0f; // how far each half bends round from the top
+    static constexpr float cHappyCentre       = 0.40f; // middle of the arc, x eye height from its top
 
     // ---- Blink and idle timing -------------------------------------------------------
     static constexpr uint8_t cBlinkFrames = 2; // frames the eyes stay shut per blink
@@ -154,6 +169,37 @@ class StatusDisplay
     // where the nearer eye has grown by the full cCuriosityGrowth.
     static constexpr float cCuriosityEdge   = 0.25f;
     static constexpr int   cCuriosityGrowth = 15; // pixels of extra height
+
+    // ---- Perspective -----------------------------------------------------------------
+    // The shell the eyes are wrapped onto, and how far the gaze turns it. The camera sits
+    // cCameraDistance shell radii in front of the shell's centre; nearer exaggerates how much
+    // the near eye grows. The front of the shell is drawn at 1:1.
+    static constexpr float cShellRadius    = 100.0f; // pixels
+    static constexpr float cMaxYawDeg      = 20.0f;  // gaze fully left or right
+    static constexpr float cMaxPitchDeg    = 10.0f;  // gaze fully up or down
+    static constexpr float cCameraDistance = 3.1f;   // shell radii
+
+    // eResize: a turned eye is taller on its near side than on its far side. 1 draws that
+    // taper true to the shell - about 2 pixels at full gaze; 2 doubles it, 0 turns it off.
+    static constexpr float cKeystoneGain = 1.0f;
+
+    // ---- Sleepy ----------------------------------------------------------------------
+    // One eye is a half-closed lid, the other a thin slit; the slit wanders from one eye to
+    // the other and back. k is 0 for the lid and 1 for the slit, and everything below blends
+    // between the two with it.
+    static constexpr float cSleepyLidClose     = 0.42f; // fraction of the height closed: lid
+    static constexpr float cSleepySlitClose    = 0.78f; //                                slit
+    static constexpr float cSleepyLidDrop      = 0.04f; // centre line lowered, x height: lid
+    static constexpr float cSleepySlitDrop     = 0.16f; //                                slit
+    static constexpr float cSleepySlitTiltDeg  = 6.0f;  // the slit droops towards the outside
+    static constexpr float cSleepyLidSag       = 0.2f;  // the lid's outer top corner, x height
+    static constexpr float cSleepyRadiusScale  = 0.4f;  // crisper corners on the narrow shapes
+    static constexpr int   cSleepySpace        = 4;     // the eyes move closer together
+    static constexpr unsigned long cSleepySwapMs   = 7000;  // slit there and back
+    static constexpr unsigned long cSleepyDozeMs   = 10500; // one nod-off cycle
+    static constexpr unsigned long cSleepyDozeAtMs = 8200;  // when in the cycle it nods off
+    static constexpr unsigned long cSleepyShutMs   = 1200;  // eyes droop shut over this
+    static constexpr unsigned long cSleepyHoldMs   = 200;   // and stay shut this long
 
     // ---- Fault view ------------------------------------------------------------------
     static constexpr int    cErrorFaceHeight     = 30; // rows reserved for the crossed eyes
@@ -172,7 +218,22 @@ class StatusDisplay
     void drawError();
     void drawEye(int x, int centreY, int width, int height, bool isLeftEye);
     void drawMoodMask(int x, int y, int width, int height, bool isLeftEye);
-    void drawHappyLid(int x, int y, int width, int height);
+    void drawHappyArc(int x, int centreY, int width, int height, bool isLeftEye);
+
+    // A rounded box drawn column by column, sheared so one end sits drop pixels lower, and
+    // tapered so its left and right sides are the given fractions of its height.
+    void drawTiltedBox(int x, int y, int width, int height, int radius, int drop, bool lowLeft,
+                       float leftSide = 1.0f, float rightSide = 1.0f);
+
+    // Sleepy: k per eye (0 = lid, 1 = slit) and the doze factor (1 = open, near 0 = shut).
+    void sleepyPose(float& kLeft, float& kRight, float& doze) const;
+
+    // eResize: where an eye drawn at x..x+width, centred on centreY, lands once the shell
+    // has turned by the gaze (each -1..+1). Replaces all four values; never shrinks a side
+    // below 1 pixel. sides, if given, receives the heights of its left and right side as
+    // fractions of its height, with cKeystoneGain applied.
+    void projectEye(float gazeX, float gazeY, int& x, int& centreY, int& width, int& height,
+                    float* sides = nullptr) const;
     void drawCross(int x, int y, int size);
 
     // Draw text horizontally centered on the given baseline, dropping trailing characters
@@ -225,6 +286,20 @@ class StatusDisplay
     int           myIdleIntervalS  = 2;
     int           myIdleVariationS = 2;
     unsigned long myNextIdleTime   = 0;
+
+    // ---- Perspective and sleepy ------------------------------------------------------
+    Perspective   myPerspective = Perspective::eFlat;
+    unsigned long mySleepyStart = 0;
+    float         myKL = 0.0f, myKR = 0.0f; // sleepy slit weight of the eye being drawn
+    int           myDropL = 0, myDropR = 0; // sleepy: centre lines lowered, tweened, pixels
+
+    // The height each eye has fully open, as drawn - the happy arc is laid out for it.
+    int           myOpenHeightL = 0, myOpenHeightR = 0;
+
+    // eResize: each eye's left and right side as a fraction of its height. 1 and 1 is an
+    // upright box, as in the flat view.
+    float         mySidesL[2] = { 1.0f, 1.0f };
+    float         mySidesR[2] = { 1.0f, 1.0f };
 
     // ---- Gaze ------------------------------------------------------------------------
     bool  myCuriosity = false;
