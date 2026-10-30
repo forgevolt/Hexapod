@@ -7,7 +7,7 @@ drawings.
 |---|---|
 | `cad/Hexapod.f3z` | The Fusion source, as an archive containing the whole assembly |
 | `stl/` | Print-ready meshes, 18 parts |
-| `print-profiles/` | Bambu Studio projects for the parts that are tricky to print |
+| `print-profiles/` | Bambu Studio projects for the parts that are tricky to print because they need supports |
 | `dimensions-top.png`, `dimensions-side.png` | Overall dimensions |
 
 ## Leg naming
@@ -62,7 +62,10 @@ nozzle**:
 | Infill | 100% for the coxa and the tibia, 15% gyroid for the top plate |
 | Supports | painted supports for the coxa, tree supports for the tibia and the top plate |
 | Brim | auto |
-| Material | ABS-GF, except the tibia in Polymaker HT-PLA-GF |
+| Material | ABS-GF; the tibia profile is set up for Polymaker HT-PLA-GF |
+
+Materials that have given good results: **ABS-GF** and **Polymaker HT-PLA-GF**. ABS-GF is
+preferred: it is a little more flexible while still stiff.
 
 ### Print orientation
 
@@ -75,9 +78,9 @@ nozzle**:
 ## About `print-profiles/`
 
 These are Bambu Studio projects: a full copy of the mesh plus the slicer state, specific to one
-printer and one filament. They cover the parts that are tricky to print, and are here as a
-reference for anyone with the same machine. On any other printer, the STLs plus the tables above
-carry the same information in a form your own slicer can use.
+printer and one filament. They cover only the parts that are tricky to print because they need
+supports, and are here as a reference for anyone with the same machine. On any other printer, the
+STLs plus the tables above carry the same information in a form your own slicer can use.
 
 **Use the profiles for print direction and settings only.** The meshes inside them may be older
 than the STLs in `stl/`, so load the current STL in place of the mesh in the project before
