@@ -66,7 +66,7 @@ it. The schematic is in [`hardware/schematic.pdf`](hardware/schematic.pdf).
 |---|---|
 | [`software/`](software) | The firmware sketch, plus the bring-up and calibration sketches |
 | [`hardware/`](hardware) | PCB: EasyEDA project, Gerbers, schematic, bill of materials |
-| [`mechanics/`](mechanics) | Chassis and legs: Fusion source, STLs, dimensioned drawings |
+| [`mechanics/`](mechanics) | Chassis and legs: Fusion source, STLs, print profiles, dimensioned drawings |
 | [`docs/`](docs) | Photographs, the manuals, and the inverse-kinematics write-up |
 
 Each of those has its own README.

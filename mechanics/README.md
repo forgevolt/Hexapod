@@ -1,11 +1,13 @@
 # Mechanics
 
-The chassis and legs: Fusion source, print-ready meshes, and the dimensioned drawings.
+The chassis and legs: Fusion source, print-ready meshes, print profiles, and the dimensioned
+drawings.
 
 | Path | Contents |
 |---|---|
 | `cad/Hexapod.f3z` | The Fusion source, as an archive containing the whole assembly |
 | `stl/` | Print-ready meshes, 18 parts |
+| `print-profiles/` | Bambu Studio projects for the parts that are tricky to print |
 | `dimensions-top.png`, `dimensions-side.png` | Overall dimensions |
 
 ## Leg naming
@@ -43,11 +45,43 @@ geometry.
 
 ## Printing
 
-No slicer projects are included, so use your own profile. The parts that carry load are the
-coxa and femur brackets and the centre body's top plate - a leg's own weight plus the
-servo's stall torque goes through them, so treat infill and wall count there as structural
-rather than cosmetic. The cover with the diffusor is the exception in the other direction:
-it is meant to pass light from the LED strip.
+The parts that carry load are the coxa and femur brackets and the centre body's top plate - a
+leg's own weight plus the servo's stall torque goes through them, so treat infill and wall count
+there as structural rather than cosmetic. The cover with the diffusor is the exception in the
+other direction: it is meant to pass light from the LED strip.
+
+### Print settings
+
+Taken from the profiles in `print-profiles/`, all sliced for a **Bambu Lab H2D with a 0.4 mm
+nozzle**:
+
+| | |
+|---|---|
+| Layer height | 0.16 mm (first layer 0.2 mm for the coxa, 0.1 mm for the tibia and the top plate) |
+| Walls | 4 |
+| Infill | 100% for the coxa and the tibia, 15% gyroid for the top plate |
+| Supports | painted supports for the coxa, tree supports for the tibia and the top plate |
+| Brim | auto |
+| Material | ABS-GF, except the tibia in Polymaker HT-PLA-GF |
+
+### Print orientation
+
+| Part | Lies on the plate |
+|---|---|
+| `Coxa-Upper` | on the flat tab with the bearing hole, the U opening facing up |
+| `Tibia` | on its side, the curve flat on the plate (about 38 mm high) |
+| `CenterBody-TopPlate` | flat, on its underside |
+
+## About `print-profiles/`
+
+These are Bambu Studio projects: a full copy of the mesh plus the slicer state, specific to one
+printer and one filament. They cover the parts that are tricky to print, and are here as a
+reference for anyone with the same machine. On any other printer, the STLs plus the tables above
+carry the same information in a form your own slicer can use.
+
+**Use the profiles for print direction and settings only.** The meshes inside them may be older
+than the STLs in `stl/`, so load the current STL in place of the mesh in the project before
+printing.
 
 ## Servo and bracket geometry
 
