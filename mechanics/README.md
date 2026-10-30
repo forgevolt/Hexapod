@@ -55,7 +55,6 @@ other direction: it is meant to pass light from the LED strip.
 Taken from the profiles in `print-profiles/`, all sliced for a **Bambu Lab H2D with a 0.4 mm
 nozzle**:
 
-| | |
 |---|---|
 | Layer height | 0.16 mm (first layer 0.2 mm for the coxa, 0.1 mm for the tibia and the top plate) |
 | Walls | 4 |
