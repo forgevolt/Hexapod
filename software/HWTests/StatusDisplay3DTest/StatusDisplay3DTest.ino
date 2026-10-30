@@ -3,14 +3,14 @@
 // sound. StatusDisplay.h/.cpp here are a copy of the hexapod's, extended with
 // setPerspective() and Mood::eSleepy; nothing in software/Hexapod uses them yet.
 //
-// With perspective on, the eyes are drawn exactly as before and then wrapped onto a round
-// shell that turns with the gaze. With the gaze centred they must look exactly like the
-// current eyes; the first step checks that.
+// With perspective on, the eyes sit on a round shell that turns with the gaze: the shell moves
+// and resizes each eye, which is then drawn as usual. With the gaze centred they must look
+// exactly like the current eyes; the first step checks that.
 //
 // Wiring: an SH1106 128x64 OLED on the I2C pins below. Nothing else is required.
 //
 // The sketch walks through the steps below, printing what each one shows to Serial, plus
-// the slowest update() of the step just finished - the cost of the warp.
+// the slowest update() of the step just finished, including sending the frame over I2C.
 //
 // Serial commands (115200 baud):
 //   n  advance to the next step immediately
@@ -46,7 +46,7 @@ enum class Step : uint8_t
 Step          myStep          = Step::eFrontView;
 unsigned long myStepStartedAt = 0;
 bool          myPaused        = false;
-bool          myPerspective   = true;
+StatusDisplay::Perspective myPerspective = StatusDisplay::Perspective::eResize;
 unsigned long mySlowestUs     = 0;
 
 // ----------------------------------------------------------------------------------------
@@ -143,9 +143,12 @@ void handleSerial()
       break;
 
     case 'd':
-      myPerspective = !myPerspective;
+      myPerspective = (myPerspective == StatusDisplay::Perspective::eResize)
+                    ? StatusDisplay::Perspective::eFlat
+                    : StatusDisplay::Perspective::eResize;
       myDisplay.setPerspective(myPerspective);
-      Serial.println(myPerspective ? "perspective on" : "perspective off (flat, as today)");
+      Serial.println((myPerspective == StatusDisplay::Perspective::eResize)
+                     ? "perspective on" : "perspective off (flat, as today)");
       break;
 
     case '?':

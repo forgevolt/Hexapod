@@ -26,8 +26,8 @@
 //
 // - Eyes: two rounded rectangles that tween toward their configured size and position,
 //   blink on a timer, and take on a mood by masking parts of the eye with background.
-//   With perspective on, the finished eyes are wrapped onto a round shell that turns with
-//   the gaze instead of sliding across the screen - see warpToShell().
+//   With perspective on, the eyes sit on a round shell that turns with the gaze instead of
+//   sliding across the screen - see setPerspective().
 // - Error: a fault face (crossed eyes) above two lines of text, entered by showError()
 //   and held until clearError(). Errors override the eyes entirely.
 //
@@ -48,6 +48,13 @@ class StatusDisplay
       eFocused,     // upper inner corners masked, giving brows drawn together
       eHappy,       // reshaped into an arc, giving a smiling squint
       eSleepy       // one half-closed lid and one thin slit that swap sides; nods off now and then
+    };
+
+    // How the gaze is shown.
+    enum class Perspective : uint8_t
+    {
+      eFlat = 0, // the eyes slide across the screen, as they always have
+      eResize    // the shell moves and resizes each eye, which is then drawn as usual
     };
 
     explicit StatusDisplay();
@@ -94,9 +101,9 @@ class StatusDisplay
     // +1 is right/bottom of the reachable range. Overrides idle mode for that frame.
     void setLookDirection(float x, float y = 0.0f);
 
-    // Draw the eyes as if painted on a round shell that turns with the gaze, instead of
+    // Show the eyes as if painted on a round shell that turns with the gaze, instead of
     // sliding them across the screen. With the gaze centred both look exactly the same.
-    void setPerspective(bool active);
+    void setPerspective(Perspective perspective);
 
 
     // ---- Fault reporting -------------------------------------------------------------
@@ -172,6 +179,10 @@ class StatusDisplay
     static constexpr float cMaxPitchDeg    = 10.0f;  // gaze fully up or down
     static constexpr float cCameraDistance = 3.1f;   // shell radii
 
+    // eResize: a turned eye is taller on its near side than on its far side. 1 draws that
+    // taper true to the shell - about 2 pixels at full gaze; 2 doubles it, 0 turns it off.
+    static constexpr float cKeystoneGain = 1.0f;
+
     // ---- Sleepy ----------------------------------------------------------------------
     // One eye is a half-closed lid, the other a thin slit; the slit wanders from one eye to
     // the other and back. k is 0 for the lid and 1 for the slit, and everything below blends
@@ -209,14 +220,20 @@ class StatusDisplay
     void drawMoodMask(int x, int y, int width, int height, bool isLeftEye);
     void drawHappyArc(int x, int centreY, int width, int height, bool isLeftEye);
 
-    // A rounded box drawn column by column, sheared so one end sits drop pixels lower.
-    void drawTiltedBox(int x, int y, int width, int height, int radius, int drop, bool lowLeft);
+    // A rounded box drawn column by column, sheared so one end sits drop pixels lower, and
+    // tapered so its left and right sides are the given fractions of its height.
+    void drawTiltedBox(int x, int y, int width, int height, int radius, int drop, bool lowLeft,
+                       float leftSide = 1.0f, float rightSide = 1.0f);
 
     // Sleepy: k per eye (0 = lid, 1 = slit) and the doze factor (1 = open, near 0 = shut).
     void sleepyPose(float& kLeft, float& kRight, float& doze) const;
 
-    // Wrap the frame just drawn onto the shell, turned by the gaze (each -1..+1).
-    void warpToShell(float gazeX, float gazeY);
+    // eResize: where an eye drawn at x..x+width, centred on centreY, lands once the shell
+    // has turned by the gaze (each -1..+1). Replaces all four values; never shrinks a side
+    // below 1 pixel. sides, if given, receives the heights of its left and right side as
+    // fractions of its height, with cKeystoneGain applied.
+    void projectEye(float gazeX, float gazeY, int& x, int& centreY, int& width, int& height,
+                    float* sides = nullptr) const;
     void drawCross(int x, int y, int size);
 
     // Draw text horizontally centered on the given baseline, dropping trailing characters
@@ -271,13 +288,18 @@ class StatusDisplay
     unsigned long myNextIdleTime   = 0;
 
     // ---- Perspective and sleepy ------------------------------------------------------
-    bool          myPerspective = false;
+    Perspective   myPerspective = Perspective::eFlat;
     unsigned long mySleepyStart = 0;
     float         myKL = 0.0f, myKR = 0.0f; // sleepy slit weight of the eye being drawn
     int           myDropL = 0, myDropR = 0; // sleepy: centre lines lowered, tweened, pixels
 
-    // The frame before warpToShell() moves it, in u8g2's page layout.
-    uint8_t mySource[cScreenWidth * cScreenHeight / 8];
+    // The height each eye has fully open, as drawn - the happy arc is laid out for it.
+    int           myOpenHeightL = 0, myOpenHeightR = 0;
+
+    // eResize: each eye's left and right side as a fraction of its height. 1 and 1 is an
+    // upright box, as in the flat view.
+    float         mySidesL[2] = { 1.0f, 1.0f };
+    float         mySidesR[2] = { 1.0f, 1.0f };
 
     // ---- Gaze ------------------------------------------------------------------------
     bool  myCuriosity = false;

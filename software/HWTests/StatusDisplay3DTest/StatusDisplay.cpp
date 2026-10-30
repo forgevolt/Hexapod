@@ -1,7 +1,7 @@
 #include "StatusDisplay.h"
 
-#include <cmath>   // sqrtf, tanf, cosf, sinf, floorf, fabsf
-#include <cstring> // strlen, memcpy, memset
+#include <cmath>   // sqrtf, tanf, cosf, sinf, floorf, fabsf, fminf, fmaxf
+#include <cstring> // strlen
 
 // ---- StatusDisplay ---------------------------------------------------------------------
 
@@ -194,9 +194,9 @@ void StatusDisplay::setLookDirection(float x, float y)
 }
 
 // ----------------------------------------------------------------------------------------
-void StatusDisplay::setPerspective(bool active)
+void StatusDisplay::setPerspective(Perspective perspective)
 {
-  myPerspective = active;
+  myPerspective = perspective;
 }
 
 
@@ -450,15 +450,15 @@ void StatusDisplay::drawEyes()
   myDropL = tween(myDropL, dropTargetL);
   myDropR = tween(myDropR, dropTargetR);
 
-  // Perspective: the eyes are always drawn where a centred gaze puts them, and the gaze
-  // turns the shell instead - so the front view is the flat view, pixel for pixel. The
-  // centre is the same integer position a centred setLookDirection() targets.
+  // Perspective: the eyes are placed where a centred gaze puts them, and the gaze turns the
+  // shell instead - so the front view is the flat view, pixel for pixel. The centre is the
+  // same integer position a centred setLookDirection() targets.
   int   posX  = myPosX;
   int   posY  = myPosY;
   float gazeX = 0.0f;
   float gazeY = 0.0f;
 
-  if (myPerspective == true)
+  if (myPerspective != Perspective::eFlat)
   {
     const int centreX = rangeX / 2;
     const int centreY = rangeY / 2;
@@ -478,15 +478,143 @@ void StatusDisplay::drawEyes()
   const int centreYL = posY + myHeightTargetL / 2 + myDropL;
   const int centreYR = posY + myHeightTargetR / 2 + myDropR;
 
-  const int leftX  = posX;
-  const int rightX = posX + myWidthL + mySpace;
+  int xL = posX,                     yL = centreYL, wL = myWidthL, hL = myHeightL;
+  int xR = posX + myWidthL + mySpace, yR = centreYR, wR = myWidthR, hR = myHeightR;
 
-  drawEye(leftX,  centreYL, myWidthL, myHeightL, /*isLeftEye=*/true);
-  drawEye(rightX, centreYR, myWidthR, myHeightR, /*isLeftEye=*/false);
+  myOpenHeightL = myHeightTargetL;
+  myOpenHeightR = myHeightTargetR;
 
-  // A centred gaze needs no warp: it would map every pixel onto itself.
-  if (myPerspective == true && (gazeX != 0.0f || gazeY != 0.0f))
-    warpToShell(gazeX, gazeY);
+  mySidesL[0] = mySidesL[1] = 1.0f;
+  mySidesR[0] = mySidesR[1] = 1.0f;
+
+  // A centred gaze needs no projection: it would map each eye onto itself.
+  const bool turned = (gazeX != 0.0f || gazeY != 0.0f);
+
+  if (myPerspective == Perspective::eResize && turned == true)
+  {
+    // The open height goes through the shell too, so a happy arc keeps its proportions.
+    int x = xL;
+    int y = yL;
+    int w = wL;
+    projectEye(gazeX, gazeY, x, y, w, myOpenHeightL);
+
+    x = xR;
+    y = yR;
+    w = wR;
+    projectEye(gazeX, gazeY, x, y, w, myOpenHeightR);
+
+    projectEye(gazeX, gazeY, xL, yL, wL, hL, mySidesL);
+    projectEye(gazeX, gazeY, xR, yR, wR, hR, mySidesR);
+  }
+
+  drawEye(xL, yL, wL, hL, /*isLeftEye=*/true);
+  drawEye(xR, yR, wR, hR, /*isLeftEye=*/false);
+}
+
+// ----------------------------------------------------------------------------------------
+// eResize: each eye's outline is taken onto the shell as the front view shows it, the shell is
+// turned by the gaze, and the eye becomes the box that spans its turned outline - the near
+// eye grows, the far one narrows - tapered so its near side is taller than its far side. The
+// eye is then drawn as usual at that size, so its edges stay as clean as in the flat view.
+// Eight points per eye: the corners and the middle of each side, where the shell bulges an
+// edge the most.
+void StatusDisplay::projectEye(float gazeX, float gazeY, int& x, int& centreY, int& width, int& height,
+                               float* sides) const
+{
+  const float R  = cShellRadius;
+  const float D  = cCameraDistance * R;
+  const float f  = D - R;               // focal length that draws the shell's front at 1:1
+  const float c0 = D * D - R * R;
+
+  const float yaw   = gazeX * cMaxYawDeg   * DEG_TO_RAD;
+  const float pitch = gazeY * cMaxPitchDeg * DEG_TO_RAD;
+  const float cosYaw   = cosf(yaw),   sinYaw   = sinf(yaw);
+  const float cosPitch = cosf(pitch), sinPitch = sinf(pitch);
+
+  const float halfW = static_cast<float>(cScreenWidth)  / 2.0f;
+  const float halfH = static_cast<float>(cScreenHeight) / 2.0f;
+
+  const float left   = static_cast<float>(x);
+  const float right  = static_cast<float>(x + width);
+  const float top    = static_cast<float>(centreY - height / 2);
+  const float bottom = top + static_cast<float>(height);
+  const float midX   = (left + right) / 2.0f;
+  const float midY   = (top + bottom) / 2.0f;
+
+  const float pointsX[8] = { left, midX, right, right, right, midX, left, left };
+  const float pointsY[8] = { top,  top,  top,   midY,  bottom, bottom, bottom, midY };
+
+  float minX = 1e9f, maxX = -1e9f, minY = 1e9f, maxY = -1e9f;
+  float projectedY[8];
+
+  for (int i = 0; i < 8; i++)
+  {
+    // The camera ray through this point of the front view, (a*t, b*t, D - t), meets the shell
+    // where (a^2 + b^2 + 1) t^2 - 2 D t + (D^2 - R^2) = 0. The smaller root is the near side.
+    // A point beside the shell - only in the screen's corners - is taken to its rim.
+    const float a    = (pointsX[i] - halfW) / f;
+    const float b    = (pointsY[i] - halfH) / f;
+    const float k    = a * a + b * b + 1.0f;
+    float       disc = D * D - k * c0;
+
+    if (disc < 0.0f)
+      disc = 0.0f;
+
+    const float t = (D - sqrtf(disc)) / k;
+    const float X = a * t;
+    const float Y = b * t;
+    const float Z = D - t;
+
+    // Turn the shell by the gaze: the yaw, then the pitch.
+    const float x1 =  X * cosYaw + Z * sinYaw;
+    const float z1 = -X * sinYaw + Z * cosYaw;
+    const float y2 =  Y * cosPitch + z1 * sinPitch;
+    const float z2 = -Y * sinPitch + z1 * cosPitch;
+
+    // And back through the camera.
+    const float s  = f / (D - z2);
+    const float sx = halfW + x1 * s;
+    const float sy = halfH + y2 * s;
+
+    if (sx < minX) minX = sx;
+    if (sx > maxX) maxX = sx;
+    if (sy < minY) minY = sy;
+    if (sy > maxY) maxY = sy;
+
+    projectedY[i] = sy;
+  }
+
+  // The height of the left side (points 6, 7, 0) and the right side (2, 3, 4), relative to
+  // the taller of the two, with the taper scaled by cKeystoneGain.
+  if (sides != nullptr)
+  {
+    const auto span = [&projectedY](int p, int q, int r) {
+      const float low  = fminf(projectedY[p], fminf(projectedY[q], projectedY[r]));
+      const float high = fmaxf(projectedY[p], fmaxf(projectedY[q], projectedY[r]));
+      return high - low;
+    };
+
+    const float leftSide  = span(6, 7, 0);
+    const float rightSide = span(2, 3, 4);
+    const float taller    = fmaxf(leftSide, rightSide);
+
+    for (int side = 0; side < 2; side++)
+    {
+      const float fraction = (taller > 0.0f) ? ((side == 0) ? leftSide : rightSide) / taller : 1.0f;
+      const float tapered  = 1.0f - (1.0f - fraction) * cKeystoneGain;
+      sides[side] = (tapered > 0.0f) ? tapered : 0.0f;
+    }
+  }
+
+  const int newLeft   = static_cast<int>(floorf(minX + 0.5f));
+  const int newRight  = static_cast<int>(floorf(maxX + 0.5f));
+  const int newTop    = static_cast<int>(floorf(minY + 0.5f));
+  const int newBottom = static_cast<int>(floorf(maxY + 0.5f));
+
+  x       = newLeft;
+  width   = (newRight  - newLeft > 1) ? newRight  - newLeft : 1;
+  height  = (newBottom - newTop  > 1) ? newBottom - newTop  : 1;
+  centreY = newTop + height / 2;
 }
 
 // ----------------------------------------------------------------------------------------
@@ -558,8 +686,11 @@ void StatusDisplay::drawEye(int x, int centreY, int width, int height, bool isLe
                    ? static_cast<int>(tanf(cSleepySlitTiltDeg * DEG_TO_RAD) * static_cast<float>(width) * k + 0.5f)
                    : 0;
 
-  if (tilt > 0)
-    drawTiltedBox(x, y, width, height, radius, tilt, /*lowLeft=*/isLeftEye);
+  // eResize: the near side taller than the far one.
+  const float* const sides = (isLeftEye == true) ? mySidesL : mySidesR;
+
+  if (tilt > 0 || sides[0] != 1.0f || sides[1] != 1.0f)
+    drawTiltedBox(x, y, width, height, radius, tilt, /*lowLeft=*/isLeftEye, sides[0], sides[1]);
   else if (radius > 0)
     myDisplay.drawRBox(x, y, width, height, radius);
   else
@@ -640,12 +771,21 @@ void StatusDisplay::drawMoodMask(int x, int y, int width, int height, bool isLef
 }
 
 // ----------------------------------------------------------------------------------------
-void StatusDisplay::drawTiltedBox(int x, int y, int width, int height, int radius, int drop, bool lowLeft)
+void StatusDisplay::drawTiltedBox(int x, int y, int width, int height, int radius, int drop, bool lowLeft,
+                                  float leftSide, float rightSide)
 {
   const float last = static_cast<float>((width > 1) ? width - 1 : 1);
 
   for (int column = 0; column < width; column++)
   {
+    // The taper: this column's top and bottom move in by the same whole number of pixels, so
+    // both edges step together as mirrored straight lines. At least a pixel stays.
+    const float along  = static_cast<float>(column) / last;               // 0 at the left end
+    const float side   = leftSide + (rightSide - leftSide) * along;
+    const int   offset = static_cast<int>(floorf(static_cast<float>(height) * (1.0f - side) / 2.0f + 0.5f));
+    int         tall   = height - 2 * offset;
+    if (tall < 1) tall = 1;
+
     // Rounded corners: how far this column is pulled in from the top and the bottom.
     const int fromEdge = (column < width - 1 - column) ? column : width - 1 - column;
     int       inset    = 0;
@@ -657,11 +797,10 @@ void StatusDisplay::drawTiltedBox(int x, int y, int width, int height, int radiu
     }
 
     // The shear, centred on the eye so it tilts about its middle.
-    const float along = static_cast<float>(column) / last;               // 0 at the left end
     const float lower = (lowLeft == true) ? (0.5f - along) : (along - 0.5f);
-    const int   top   = y + inset + static_cast<int>(lower * static_cast<float>(drop) + (lower >= 0 ? 0.5f : -0.5f));
+    const int   top   = y + offset + inset + static_cast<int>(lower * static_cast<float>(drop) + (lower >= 0 ? 0.5f : -0.5f));
     int         from  = top;
-    int         to    = top + height - 2 * inset - 1;
+    int         to    = top + tall - 2 * inset - 1;
 
     // u8g2 takes unsigned coordinates, so clip here rather than let a negative one wrap.
     if (from < 0) from = 0;
@@ -670,79 +809,6 @@ void StatusDisplay::drawTiltedBox(int x, int y, int width, int height, int radiu
     const int columnX = x + column;
     if (to >= from && columnX >= 0 && columnX < cScreenWidth)
       myDisplay.drawVLine(columnX, from, to - from + 1);
-  }
-}
-
-// ----------------------------------------------------------------------------------------
-// Perspective, as an image warp: every screen pixel is traced back through the camera onto
-// the shell as the gaze has turned it, the shell is turned back to face the camera, and the
-// pixel takes the value the flat frame has at that spot. Seen straight on, this maps every
-// pixel onto itself, so the turned view is a true 3D view of exactly the flat drawing - moods,
-// blinks and all.
-//
-// Per pixel: one square root and one division, no trigonometry. About 8,000 pixels a frame.
-void StatusDisplay::warpToShell(float gazeX, float gazeY)
-{
-  uint8_t* const buffer = myDisplay.getBufferPtr();
-
-  memcpy(mySource, buffer, sizeof(mySource));
-  memset(buffer, 0, sizeof(mySource));
-
-  const float R  = cShellRadius;
-  const float D  = cCameraDistance * R;
-  const float f  = D - R;               // focal length that draws the shell's front at 1:1
-  const float c0 = D * D - R * R;
-
-  const float yaw   = gazeX * cMaxYawDeg   * DEG_TO_RAD;
-  const float pitch = gazeY * cMaxPitchDeg * DEG_TO_RAD;
-  const float cosYaw   = cosf(yaw),   sinYaw   = sinf(yaw);
-  const float cosPitch = cosf(pitch), sinPitch = sinf(pitch);
-
-  const float halfW = static_cast<float>(cScreenWidth)  / 2.0f;
-  const float halfH = static_cast<float>(cScreenHeight) / 2.0f;
-
-  for (int py = 0; py < cScreenHeight; py++)
-  {
-    const float b = (static_cast<float>(py) + 0.5f - halfH) / f;
-
-    for (int px = 0; px < cScreenWidth; px++)
-    {
-      const float a = (static_cast<float>(px) + 0.5f - halfW) / f;
-
-      // The camera ray through this pixel, (a*t, b*t, D - t), meets the shell where
-      // (a^2 + b^2 + 1) t^2 - 2 D t + (D^2 - R^2) = 0. The smaller root is the near side.
-      const float k    = a * a + b * b + 1.0f;
-      const float disc = D * D - k * c0;
-
-      if (disc < 0.0f)
-        continue; // the ray passes beside the shell
-
-      const float t = (D - sqrtf(disc)) / k;
-      const float X = a * t;
-      const float Y = b * t;
-      const float Z = D - t;
-
-      // Turn the point back to the front view: undo the pitch, then the yaw.
-      const float y0 = Y * cosPitch - Z * sinPitch;
-      const float z1 = Y * sinPitch + Z * cosPitch;
-      const float x0 = X * cosYaw - z1 * sinYaw;
-      const float z0 = X * sinYaw + z1 * cosYaw;
-
-      if (z0 <= 0.0f)
-        continue; // on the far side of the shell
-
-      // Where the camera sees that point when the shell faces it - the flat frame.
-      const float s  = f / (D - z0);
-      const int   sx = static_cast<int>(floorf(halfW + x0 * s));
-      const int   sy = static_cast<int>(floorf(halfH + y0 * s));
-
-      if (sx < 0 || sx >= cScreenWidth || sy < 0 || sy >= cScreenHeight)
-        continue;
-
-      // u8g2's full buffer is page-ordered: one byte holds 8 vertical pixels.
-      if ((mySource[(sy >> 3) * cScreenWidth + sx] & (1u << (sy & 7))) != 0)
-        buffer[(py >> 3) * cScreenWidth + px] |= static_cast<uint8_t>(1u << (py & 7));
-    }
   }
 }
 
@@ -764,9 +830,10 @@ void StatusDisplay::drawHappyArc(int x, int centreY, int width, int height, bool
   if (width <= 1 || height <= 0)
     return;
 
-  const int target = (isLeftEye == true) ? myHeightTargetL : myHeightTargetR;
-  const int open   = (height > target) ? height : target;
-  const int eyeTop = centreY - open / 2;
+  const int          target = (isLeftEye == true) ? myOpenHeightL : myOpenHeightR;
+  const float* const sides  = (isLeftEye == true) ? mySidesL : mySidesR;
+  const int          open   = (height > target) ? height : target;
+  const int          eyeTop = centreY - open / 2;
 
   const float w = static_cast<float>(width);
   const float h = static_cast<float>(open);
@@ -824,6 +891,10 @@ void StatusDisplay::drawHappyArc(int x, int centreY, int width, int height, bool
 
     const float dx = fabsf(static_cast<float>(column) - centreX);
 
+    // eResize: the near side taller than the far one.
+    const float along = static_cast<float>(column) / ((width > 1) ? w - 1.0f : 1.0f);
+    const float taper = sides[0] + (sides[1] - sides[0]) * along;
+
     // Each column of the arc is a single run; find its ends.
     int first = 0;
     while (first < open && isLit(dx, first) == false)
@@ -837,8 +908,8 @@ void StatusDisplay::drawHappyArc(int x, int centreY, int width, int height, bool
       last--;
 
     // Squash the run towards the pivot. At least one pixel stays, so a shut eye is a line.
-    const float runTop    = pivot + (static_cast<float>(eyeTop + first)    - pivot) * squash;
-    const float runBottom = pivot + (static_cast<float>(eyeTop + last + 1) - pivot) * squash;
+    const float runTop    = pivot + (static_cast<float>(eyeTop + first)    - pivot) * squash * taper;
+    const float runBottom = pivot + (static_cast<float>(eyeTop + last + 1) - pivot) * squash * taper;
 
     int from = static_cast<int>(floorf(runTop    + 0.5f));
     int to   = static_cast<int>(floorf(runBottom + 0.5f)) - 1;
