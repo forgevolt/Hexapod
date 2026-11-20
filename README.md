@@ -9,7 +9,10 @@ an onboard IMU, and is driven from a separate handheld transmitter over ESP-NOW.
 ▶ **[Watch it walk](https://youtu.be/4UdU5Dw7Or8)** - 14 seconds: leveling on planted feet,
 then walking toward the camera.
 
-[![The hexapod in Fusion](docs/hexapod_cad.png)](https://youtu.be/4UdU5Dw7Or8)
+▶ **[I built a hexapod that changes its walk mid-stride](https://youtu.be/vSmU1OX91-0)** -
+3:19: the hexapod walking, with close-ups of its details.
+
+[![The hexapod in Fusion](docs/hexapod_cad.png)](https://youtu.be/vSmU1OX91-0)
 
 
 ## What it does
